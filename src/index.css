@@ -107,6 +107,32 @@
     filter: drop-shadow(0 4px 20px hsl(210 80% 55% / 0.4));
   }
 
+  .chrome-text-3d {
+    background: linear-gradient(
+      180deg,
+      hsl(205 100% 98%) 0%,
+      hsl(210 80% 85%) 20%,
+      hsl(205 100% 92%) 40%,
+      hsl(210 70% 75%) 60%,
+      hsl(210 60% 55%) 80%,
+      hsl(210 80% 35%) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 
+      0 1px 0 hsl(210 80% 30%),
+      0 2px 0 hsl(210 80% 28%),
+      0 3px 0 hsl(210 80% 26%),
+      0 4px 0 hsl(210 80% 24%),
+      0 5px 0 hsl(210 80% 22%),
+      0 6px 0 hsl(210 80% 20%),
+      0 8px 15px hsl(210 100% 5% / 0.5),
+      0 15px 40px hsl(210 80% 55% / 0.4);
+    filter: drop-shadow(0 10px 40px hsl(210 80% 55% / 0.5));
+    letter-spacing: -0.02em;
+  }
+
   .severity-critical {
     @apply bg-red-500/20 text-red-400 border border-red-500/30;
   }
