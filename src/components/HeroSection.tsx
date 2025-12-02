@@ -31,8 +31,8 @@ const HeroSection = () => {
             enableBlur={true}
             baseRotation={3}
             blurStrength={8}
-            containerClassName="text-muted-foreground font-light"
-            textClassName="text-xl md:text-2xl"
+            containerClassName="text-muted-foreground"
+            textClassName="text-lg"
           >
             Where intelligence meets infrastructure
           </ScrollReveal>
