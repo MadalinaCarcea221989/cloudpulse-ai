@@ -1,18 +1,14 @@
 import CloudBackground from "@/components/CloudBackground";
 import Navigation from "@/components/Navigation";
-import HeroSection from "@/components/HeroSection";
-import DashboardSection from "@/components/DashboardSection";
 import TeamSection from "@/components/TeamSection";
 
-const Index = () => {
+const Team = () => {
   return (
     <div className="relative min-h-screen">
       <CloudBackground />
       <Navigation />
       
-      <main className="relative z-10">
-        <HeroSection />
-        <DashboardSection />
+      <main className="relative z-10 pt-20">
         <TeamSection />
       </main>
 
@@ -26,4 +22,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Team;
