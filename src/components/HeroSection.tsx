@@ -19,7 +19,7 @@ const HeroSection = () => {
         </div>
 
         {/* Main Title */}
-        <h1 className="text-6xl md:text-8xl font-black tracking-tight mb-6 chrome-text fade-in-delay-2">
+        <h1 className="text-7xl md:text-9xl lg:text-[10rem] font-black tracking-tight mb-6 chrome-text-3d fade-in-delay-2">
           cloudpulse
         </h1>
 
