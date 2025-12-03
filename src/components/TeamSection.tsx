@@ -28,7 +28,7 @@ const teamMembers: TeamMember[] = [
     role: "Data Science & AI Engineering",
     description:
       "Student at BUAS specializing in cloud monitoring solutions. Building intelligent systems for modern DevOps workflows.",
-    linkedin: "https://linkedin.com/in/victoria-vicheva",
+    linkedin: "https://www.linkedin.com/in/victoria-vicheva-3817b6263/",
     portfolio: "https://victoria.dev",
     email: "victoria@cloudpulse.io",
     phone: "+31 6 1755 5114",
