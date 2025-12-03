@@ -14,8 +14,8 @@ const AccountTypeSelector = ({ value, onChange }: AccountTypeSelectorProps) => {
           onClick={() => onChange('individual')}
           className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-left group ${
             value === 'individual'
-              ? 'border-primary bg-primary/5'
-              : 'border-border bg-card hover:border-primary/30 hover:bg-muted/30'
+              ? 'border-primary bg-primary/10'
+              : 'border-border bg-secondary/30 hover:border-primary/50 hover:bg-secondary/50'
           }`}
         >
           {value === 'individual' && (
@@ -24,7 +24,7 @@ const AccountTypeSelector = ({ value, onChange }: AccountTypeSelectorProps) => {
             </div>
           )}
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 transition-colors ${
-            value === 'individual' ? 'bg-primary/10' : 'bg-muted/50 group-hover:bg-primary/10'
+            value === 'individual' ? 'bg-primary/20' : 'bg-muted group-hover:bg-primary/10'
           }`}>
             <User className={`w-5 h-5 ${value === 'individual' ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
           </div>
@@ -36,8 +36,8 @@ const AccountTypeSelector = ({ value, onChange }: AccountTypeSelectorProps) => {
           onClick={() => onChange('company_partner')}
           className={`relative p-4 rounded-xl border-2 transition-all duration-200 text-left group ${
             value === 'company_partner'
-              ? 'border-primary bg-primary/5'
-              : 'border-border bg-card hover:border-primary/30 hover:bg-muted/30'
+              ? 'border-primary bg-primary/10'
+              : 'border-border bg-secondary/30 hover:border-primary/50 hover:bg-secondary/50'
           }`}
         >
           {value === 'company_partner' && (
@@ -46,7 +46,7 @@ const AccountTypeSelector = ({ value, onChange }: AccountTypeSelectorProps) => {
             </div>
           )}
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 transition-colors ${
-            value === 'company_partner' ? 'bg-primary/10' : 'bg-muted/50 group-hover:bg-primary/10'
+            value === 'company_partner' ? 'bg-primary/20' : 'bg-muted group-hover:bg-primary/10'
           }`}>
             <Building2 className={`w-5 h-5 ${value === 'company_partner' ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
           </div>

@@ -37,7 +37,6 @@ const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
     }
 
     setIsLoading(true);
-    // Simulate SSO redirect - in production this would redirect to the IdP
     setTimeout(() => {
       toast({
         title: 'SSO Configuration Required',
@@ -51,11 +50,11 @@ const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-card border-border shadow-elevated">
         <DialogHeader className="space-y-3">
-          <div className="mx-auto w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+          <div className="mx-auto w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center">
             <Building2 className="w-6 h-6 text-primary" />
           </div>
-          <DialogTitle className="text-center text-xl">Company SSO Login</DialogTitle>
-          <DialogDescription className="text-center">
+          <DialogTitle className="text-center text-xl text-foreground">Company SSO Login</DialogTitle>
+          <DialogDescription className="text-center text-muted-foreground">
             Enter your company email domain to sign in with your organization's identity provider.
           </DialogDescription>
         </DialogHeader>
@@ -66,17 +65,16 @@ const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
               placeholder="company.com"
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
-              className="h-12 pl-4 pr-4 text-base bg-muted/50 border-border focus:border-primary"
+              className="h-12 pl-4 pr-4 text-base bg-secondary/50 border-border focus:border-primary text-foreground"
             />
             
-            {/* Autocomplete suggestions */}
             {filteredSuggestions.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-card overflow-hidden z-10">
                 {filteredSuggestions.map((suggestion) => (
                   <button
                     key={suggestion}
                     onClick={() => setDomain(suggestion)}
-                    className="w-full px-4 py-2.5 text-left hover:bg-muted/50 transition-colors text-sm"
+                    className="w-full px-4 py-2.5 text-left hover:bg-secondary/50 transition-colors text-sm text-foreground"
                   >
                     {suggestion}
                   </button>
@@ -103,7 +101,7 @@ const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
             )}
           </Button>
 
-          <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg">
+          <div className="flex items-center gap-2 p-3 bg-secondary/30 rounded-lg border border-border">
             <Shield className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             <p className="text-xs text-muted-foreground">
               Your credentials are handled by your organization's identity provider. We never store your SSO password.

@@ -153,7 +153,7 @@ const Auth = () => {
 
   if (showOnboarding && user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-secondary/20 to-background flex items-center justify-center p-6">
+      <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <OnboardingStepper onComplete={handleOnboardingComplete} />
       </div>
     );
@@ -168,7 +168,7 @@ const Auth = () => {
       <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-[480px] space-y-6">
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center w-14 h-14 bg-primary/10 rounded-2xl mb-4">
+            <div className="inline-flex items-center justify-center w-14 h-14 bg-primary/20 rounded-2xl mb-4">
               <Shield className="w-7 h-7 text-primary" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">Welcome Back</h1>
@@ -177,7 +177,7 @@ const Auth = () => {
             </p>
           </div>
 
-          <div className="bg-card rounded-2xl p-6 shadow-card border border-border space-y-6">
+          <div className="glass-card rounded-2xl p-6 space-y-6">
             <AccountTypeSelector value={accountType} onChange={setAccountType} />
 
             <div className="relative">
@@ -185,7 +185,7 @@ const Auth = () => {
                 <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-3 text-muted-foreground">Continue with</span>
+                <span className="bg-card/50 px-3 text-muted-foreground">Continue with</span>
               </div>
             </div>
 

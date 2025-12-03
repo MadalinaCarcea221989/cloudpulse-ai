@@ -67,12 +67,6 @@ export default {
           sky: "hsl(var(--cloud-sky))",
           light: "hsl(var(--cloud-light))",
         },
-        lilac: {
-          DEFAULT: "hsl(var(--lilac))",
-          light: "hsl(var(--lilac-light))",
-          dark: "hsl(var(--lilac-dark))",
-          muted: "hsl(var(--lilac-muted))",
-        },
         severity: {
           critical: "hsl(var(--severity-critical))",
           high: "hsl(var(--severity-high))",

@@ -33,12 +33,12 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
         Back to all options
       </button>
 
-      <div className="flex gap-2 p-1 bg-muted/50 rounded-xl">
+      <div className="flex gap-2 p-1 bg-secondary/50 rounded-xl">
         <button
           onClick={() => onModeChange('signin')}
           className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
             mode === 'signin'
-              ? 'bg-card text-foreground shadow-sm'
+              ? 'bg-card text-foreground shadow-sm border border-border'
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -48,7 +48,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
           onClick={() => onModeChange('signup')}
           className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
             mode === 'signup'
-              ? 'bg-card text-foreground shadow-sm'
+              ? 'bg-card text-foreground shadow-sm border border-border'
               : 'text-muted-foreground hover:text-foreground'
           }`}
         >
@@ -68,7 +68,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
               placeholder="John Doe"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="h-12 bg-muted/50 border-border focus:border-primary"
+              className="h-12 bg-secondary/50 border-border focus:border-primary text-foreground placeholder:text-muted-foreground"
             />
           </div>
         )}
@@ -83,7 +83,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-12 bg-muted/50 border-border focus:border-primary"
+            className="h-12 bg-secondary/50 border-border focus:border-primary text-foreground placeholder:text-muted-foreground"
           />
         </div>
 
@@ -108,7 +108,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-12 bg-muted/50 border-border focus:border-primary pr-12"
+              className="h-12 bg-secondary/50 border-border focus:border-primary pr-12 text-foreground placeholder:text-muted-foreground"
             />
             <button
               type="button"

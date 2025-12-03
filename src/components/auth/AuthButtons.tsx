@@ -43,7 +43,7 @@ const AuthButtons = ({
         onClick={onSSOClick}
         disabled={isLoading}
         variant="outline"
-        className="w-full h-14 bg-card hover:bg-muted/50 border-2 border-border hover:border-primary/30 text-foreground font-medium transition-all duration-200 group"
+        className="w-full h-14 bg-secondary/50 hover:bg-secondary border border-border hover:border-primary/50 text-foreground font-medium transition-all duration-200 group"
       >
         <Shield className="w-5 h-5 mr-3 text-primary group-hover:scale-110 transition-transform" />
         <div className="flex flex-col items-start">
@@ -57,7 +57,7 @@ const AuthButtons = ({
         onClick={onGoogleSignIn}
         disabled={isLoading}
         variant="outline"
-        className="w-full h-12 bg-card hover:bg-muted/50 border border-border hover:border-primary/30 text-foreground font-medium transition-all duration-200"
+        className="w-full h-12 bg-secondary/50 hover:bg-secondary border border-border hover:border-primary/50 text-foreground font-medium transition-all duration-200"
       >
         <GoogleIcon />
         <span className="ml-3">Sign in with Google</span>
@@ -68,7 +68,7 @@ const AuthButtons = ({
         onClick={onMicrosoftSignIn}
         disabled={isLoading}
         variant="outline"
-        className="w-full h-12 bg-card hover:bg-muted/50 border border-border hover:border-primary/30 text-foreground font-medium transition-all duration-200"
+        className="w-full h-12 bg-secondary/50 hover:bg-secondary border border-border hover:border-primary/50 text-foreground font-medium transition-all duration-200"
       >
         <MicrosoftIcon />
         <span className="ml-3">Sign in with Microsoft</span>
@@ -80,7 +80,7 @@ const AuthButtons = ({
           onClick={onEmailClick}
           disabled={isLoading}
           variant="outline"
-          className="w-full h-12 bg-card hover:bg-muted/50 border border-border hover:border-primary/30 text-foreground font-medium transition-all duration-200"
+          className="w-full h-12 bg-secondary/50 hover:bg-secondary border border-border hover:border-primary/50 text-foreground font-medium transition-all duration-200"
         >
           <Mail className="w-5 h-5 mr-3 text-muted-foreground" />
           <span>Sign in with Email</span>
