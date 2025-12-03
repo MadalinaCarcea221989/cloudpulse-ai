@@ -40,6 +40,16 @@ const Navigation = () => {
             Dashboard
           </Link>
           <Link
+            to="/overview"
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              location.pathname === "/overview"
+                ? "bg-primary/20 text-cloud-light"
+                : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+            }`}
+          >
+            Overview
+          </Link>
+          <Link
             to="/team"
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
               location.pathname === "/team"
