@@ -16,9 +16,9 @@ const teamMembers: TeamMember[] = [
     name: "Mădălina Carcea",
     role: "Data Science & AI Engineering",
     description:
-      "Student at BUAS with a focus on Healthcare Tech. Passionate about leveraging AI to solve complex infrastructure challenges.",
+      "Student at BUAS with a focus on Tech. Data Science & AI Engineering student discovering problems worth solving where others stopped looking.",
     linkedin: "https://linkedin.com/in/madalina-carcea",
-    portfolio: "https://madalina.dev",
+    portfolio: "https://madalinacarcea221989.github.io/portfolio/",
     email: "madalina@cloudpulse.io",
     phone: "+31 6 4353 8696",
     image: "/placeholder.svg",
