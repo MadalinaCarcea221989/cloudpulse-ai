@@ -45,7 +45,7 @@ const OnboardingStepper = ({ onComplete }: OnboardingStepperProps) => {
     alerts: true,
     summaries: true,
     notifications: false,
-    darkMode: false,
+    darkMode: true,
   });
 
   const handleInfoTypeToggle = (id: string) => {
@@ -134,8 +134,8 @@ const OnboardingStepper = ({ onComplete }: OnboardingStepperProps) => {
                   onClick={() => setSelectedRole(role.id)}
                   className={`p-4 rounded-xl border-2 text-left transition-all duration-200 ${
                     selectedRole === role.id
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/30'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-primary/50 bg-secondary/30'
                   }`}
                 >
                   <p className="font-medium text-foreground">{role.label}</p>
@@ -159,8 +159,8 @@ const OnboardingStepper = ({ onComplete }: OnboardingStepperProps) => {
                   onClick={() => handleInfoTypeToggle(type.id)}
                   className={`p-4 rounded-xl border-2 text-left transition-all duration-200 relative ${
                     selectedInfoTypes.includes(type.id)
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border hover:border-primary/30'
+                      ? 'border-primary bg-primary/10'
+                      : 'border-border hover:border-primary/50 bg-secondary/30'
                   }`}
                 >
                   {selectedInfoTypes.includes(type.id) && (
@@ -191,7 +191,7 @@ const OnboardingStepper = ({ onComplete }: OnboardingStepperProps) => {
               ].map((pref) => (
                 <label
                   key={pref.key}
-                  className="flex items-center justify-between p-4 rounded-xl border border-border hover:bg-muted/30 cursor-pointer transition-colors"
+                  className="flex items-center justify-between p-4 rounded-xl border border-border hover:bg-secondary/30 cursor-pointer transition-colors"
                 >
                   <div>
                     <p className="font-medium text-foreground">{pref.label}</p>
@@ -230,7 +230,7 @@ const OnboardingStepper = ({ onComplete }: OnboardingStepperProps) => {
             variant="ghost"
             onClick={handleBack}
             disabled={currentStep === 1}
-            className="text-muted-foreground"
+            className="text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
