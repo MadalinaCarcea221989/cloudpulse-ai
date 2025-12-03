@@ -1,8 +1,19 @@
 import { ArrowDown, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const HeroSection = () => {
-  const scrollToDashboard = () => {
-    document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth" });
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  const handleExploreDashboard = () => {
+    if (loading) return;
+    
+    if (user) {
+      document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      navigate("/auth");
+    }
   };
 
   return (
@@ -36,8 +47,9 @@ const HeroSection = () => {
 
         {/* CTA Button */}
         <button
-          onClick={scrollToDashboard}
-          className="group glass-card px-8 py-4 text-lg font-semibold text-cloud-light hover:bg-primary/30 transition-all inline-flex items-center gap-3 fade-in-delay-3"
+          onClick={handleExploreDashboard}
+          disabled={loading}
+          className="group glass-card px-8 py-4 text-lg font-semibold text-cloud-light hover:bg-primary/30 transition-all inline-flex items-center gap-3 fade-in-delay-3 disabled:opacity-50"
         >
           Explore Dashboard
           <ArrowDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
