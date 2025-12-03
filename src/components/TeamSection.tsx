@@ -1,4 +1,4 @@
-mport { Linkedin, Globe, Mail, Phone } from "lucide-react";
+import { Linkedin, Globe, Mail, Phone } from "lucide-react";
 
 interface TeamMember {
   name: string;
@@ -15,7 +15,8 @@ const teamMembers: TeamMember[] = [
   {
     name: "Mădălina Carcea",
     role: "Data Science & AI Engineering",
-    description: "Student at BUAS with a focus on Healthcare Tech. Passionate about leveraging AI to solve complex infrastructure challenges.",
+    description:
+      "Student at BUAS with a focus on Healthcare Tech. Passionate about leveraging AI to solve complex infrastructure challenges.",
     linkedin: "https://linkedin.com/in/madalina-carcea",
     portfolio: "https://madalina.dev",
     email: "madalina@cloudpulse.io",
@@ -25,7 +26,8 @@ const teamMembers: TeamMember[] = [
   {
     name: "Victoria Vicheva",
     role: "Data Science & AI Engineering",
-    description: "Student at BUAS specializing in cloud monitoring solutions. Building intelligent systems for modern DevOps workflows.",
+    description:
+      "Student at BUAS specializing in cloud monitoring solutions. Building intelligent systems for modern DevOps workflows.",
     linkedin: "https://linkedin.com/in/victoria-vicheva",
     portfolio: "https://victoria.dev",
     email: "victoria@cloudpulse.io",
@@ -40,9 +42,7 @@ const TeamSection = () => {
       <div className="max-w-5xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold chrome-text mb-4">
-            Meet the Team Behind CloudPulse
-          </h2>
+          <h2 className="text-3xl md:text-4xl font-bold chrome-text mb-4">Meet the Team Behind CloudPulse</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Two data science students building the future of cloud infrastructure monitoring.
           </p>
@@ -54,7 +54,10 @@ const TeamSection = () => {
             <div key={member.name} className="glass-card p-6 group hover:scale-[1.02] transition-all">
               {/* Photo Placeholder */}
               <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cloud-blue to-cloud-light mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-cloud-dark">
-                {member.name.split(" ").map((n) => n[0]).join("")}
+                {member.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
               </div>
 
               {/* Info */}
@@ -65,9 +68,7 @@ const TeamSection = () => {
                 <p className="text-sm text-cloud-sky">{member.role}</p>
               </div>
 
-              <p className="text-sm text-muted-foreground text-center mb-6">
-                {member.description}
-              </p>
+              <p className="text-sm text-muted-foreground text-center mb-6">{member.description}</p>
 
               {/* QR Code Placeholder */}
               <div className="w-20 h-20 mx-auto mb-4 bg-white rounded-lg flex items-center justify-center">
