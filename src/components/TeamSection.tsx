@@ -1,4 +1,4 @@
-import { Linkedin, Globe, Mail, Phone } from "lucide-react";
+mport { Linkedin, Globe, Mail, Phone } from "lucide-react";
 
 interface TeamMember {
   name: string;
@@ -19,7 +19,7 @@ const teamMembers: TeamMember[] = [
     linkedin: "https://linkedin.com/in/madalina-carcea",
     portfolio: "https://madalina.dev",
     email: "madalina@cloudpulse.io",
-    phone: "+31 6 1234 5678",
+    phone: "+31 6 4353 8696",
     image: "/placeholder.svg",
   },
   {
@@ -29,7 +29,7 @@ const teamMembers: TeamMember[] = [
     linkedin: "https://linkedin.com/in/victoria-vicheva",
     portfolio: "https://victoria.dev",
     email: "victoria@cloudpulse.io",
-    phone: "+31 6 8765 4321",
+    phone: "+31 6 1755 5114",
     image: "/placeholder.svg",
   },
 ];
