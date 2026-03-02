@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Server, Cloud as CloudIcon, Cpu, Database, Plus, Trash2, Check, Loader2, Cable, Search } from "lucide-react";
+import { Server, Cloud as CloudIcon, Cpu, Database, Plus, Trash2, Check, Loader2, Cable, Search, AlertTriangle, WifiOff } from "lucide-react";
 import CloudBackground from "@/components/CloudBackground";
 import Navigation from "@/components/Navigation";
-import { useCloudConnections, type CloudProvider, type CloudConnection } from "@/hooks/useCloudConnections";
+import { useCloudConnections, type CloudProvider, type CloudConnection, type ConnectionStatus } from "@/hooks/useCloudConnections";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,12 @@ const providerMeta: Record<CloudProvider, { icon: React.ElementType; label: stri
   azure: { icon: CloudIcon, label: "Azure", color: "text-blue-400", bgColor: "bg-blue-400/10 border-blue-400/20" },
   openai: { icon: Cpu, label: "OpenAI", color: "text-green-400", bgColor: "bg-green-400/10 border-green-400/20" },
   gcp: { icon: Database, label: "GCP", color: "text-yellow-400", bgColor: "bg-yellow-400/10 border-yellow-400/20" },
+};
+
+const statusConfig: Record<ConnectionStatus, { icon: React.ElementType; label: string; dotClass: string; textClass: string }> = {
+  connected: { icon: Check, label: "Connected", dotClass: "bg-green-400", textClass: "text-green-400" },
+  disconnected: { icon: WifiOff, label: "Disconnected", dotClass: "bg-muted-foreground", textClass: "text-muted-foreground" },
+  error: { icon: AlertTriangle, label: "Error", dotClass: "bg-destructive", textClass: "text-destructive" },
 };
 
 const Connections = () => {
@@ -77,7 +83,12 @@ const Connections = () => {
             {(["aws", "azure", "openai", "gcp"] as CloudProvider[]).map((p) => {
               const meta = providerMeta[p];
               const Icon = meta.icon;
-              const count = connections.filter((c) => c.provider === p).length;
+              const provConns = connections.filter((c) => c.provider === p);
+              const count = provConns.length;
+              const errorCount = provConns.filter((c) => c.status === "error").length;
+              const disconnectedCount = provConns.filter((c) => c.status === "disconnected").length;
+              const healthyCount = count - errorCount - disconnectedCount;
+
               return (
                 <div key={p} className={`glass-card p-4 border ${meta.bgColor}`}>
                   <div className="flex items-center gap-2 mb-2">
@@ -86,6 +97,28 @@ const Connections = () => {
                   </div>
                   <p className="text-2xl font-bold text-foreground">{count}</p>
                   <p className="text-xs text-muted-foreground">{count === 1 ? "connection" : "connections"}</p>
+                  {count > 0 && (
+                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-cloud-blue/10">
+                      {healthyCount > 0 && (
+                        <span className="flex items-center gap-1 text-xs text-green-400">
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                          {healthyCount}
+                        </span>
+                      )}
+                      {errorCount > 0 && (
+                        <span className="flex items-center gap-1 text-xs text-destructive">
+                          <span className="w-1.5 h-1.5 rounded-full bg-destructive" />
+                          {errorCount}
+                        </span>
+                      )}
+                      {disconnectedCount > 0 && (
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />
+                          {disconnectedCount}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -144,15 +177,34 @@ const Connections = () => {
                           className="glass-card p-4 flex items-center justify-between group hover:border-cloud-blue/40 transition-colors"
                         >
                           <div className="flex items-center gap-4 min-w-0">
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${meta.bgColor}`}>
-                              <Check className="w-4 h-4 text-green-400" />
-                            </div>
+                            {(() => {
+                              const st = statusConfig[conn.status];
+                              const StatusIcon = st.icon;
+                              return (
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                  conn.status === "connected" ? meta.bgColor
+                                    : conn.status === "error" ? "bg-destructive/10 border-destructive/20"
+                                    : "bg-muted/50 border-muted-foreground/20"
+                                } border`}>
+                                  <StatusIcon className={`w-4 h-4 ${st.textClass}`} />
+                                </div>
+                              );
+                            })()}
                             <div className="min-w-0">
                               <p className="text-sm font-medium text-foreground truncate">
                                 {conn.display_name}
                               </p>
-                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                {conn.account_identifier && <span className="truncate">{conn.account_identifier}</span>}
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
+                                <span className={`flex items-center gap-1 ${statusConfig[conn.status].textClass}`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${statusConfig[conn.status].dotClass} ${conn.status === "connected" ? "animate-pulse" : ""}`} />
+                                  {statusConfig[conn.status].label}
+                                </span>
+                                {conn.account_identifier && (
+                                  <>
+                                    <span className="text-cloud-blue/40">·</span>
+                                    <span className="truncate">{conn.account_identifier}</span>
+                                  </>
+                                )}
                                 {conn.region && (
                                   <>
                                     <span className="text-cloud-blue/40">·</span>
