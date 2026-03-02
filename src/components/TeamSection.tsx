@@ -71,7 +71,7 @@ const TeamSection = () => {
               <p className="text-sm text-muted-foreground text-center mb-6">{member.description}</p>
 
               {/* QR Code Placeholder */}
-              <div className="w-20 h-20 mx-auto mb-4 rounded-lg overflow-hidden">
+              <div className="w-32 h-32 mx-auto mb-4 rounded-lg overflow-hidden bg-white p-2">
                 <img src={member.linkedinQr} alt={`${member.name} LinkedIn QR`} className="w-full h-full object-contain" />
               </div>
 
