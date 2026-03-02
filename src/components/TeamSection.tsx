@@ -21,7 +21,7 @@ const teamMembers: TeamMember[] = [
     portfolio: "https://madalinacarcea221989.github.io/portfolio/",
     email: "madalina@cloudpulse.io",
     phone: "+31 6 4353 8696",
-    image: "/placeholder.svg",
+    image: "/Madalina_profile.jpg",
   },
   {
     name: "Victoria Vicheva",
@@ -32,7 +32,7 @@ const teamMembers: TeamMember[] = [
     portfolio: "https://victoria.dev",
     email: "victoria@cloudpulse.io",
     phone: "+31 6 1755 5114",
-    image: "/placeholder.svg",
+    image: "/Vic_profile.jpg",
   },
 ];
 
@@ -52,12 +52,9 @@ const TeamSection = () => {
         <div className="grid md:grid-cols-2 gap-8">
           {teamMembers.map((member) => (
             <div key={member.name} className="glass-card p-6 group hover:scale-[1.02] transition-all">
-              {/* Photo Placeholder */}
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cloud-blue to-cloud-light mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-cloud-dark">
-                {member.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
+              {/* Profile Photo */}
+              <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden border-2 border-cloud-blue/30">
+                <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
               </div>
 
               {/* Info */}
