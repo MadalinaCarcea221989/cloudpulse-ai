@@ -25,7 +25,6 @@ const providers: ProviderFormConfig[] = [
       { key: "display_name", label: "Display Name", placeholder: "Production AWS" },
       { key: "account_identifier", label: "Account ID", placeholder: "123456789012", isIdentifier: true },
       { key: "region", label: "Default Region", placeholder: "us-east-1" },
-      { key: "access_key_id", label: "Access Key ID", placeholder: "AKIA..." },
     ],
   },
   {
@@ -37,7 +36,6 @@ const providers: ProviderFormConfig[] = [
       { key: "display_name", label: "Display Name", placeholder: "Production Azure" },
       { key: "account_identifier", label: "Subscription ID", placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", isIdentifier: true },
       { key: "region", label: "Default Region", placeholder: "East US" },
-      { key: "tenant_id", label: "Tenant ID", placeholder: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" },
     ],
   },
   {
@@ -48,7 +46,6 @@ const providers: ProviderFormConfig[] = [
     fields: [
       { key: "display_name", label: "Display Name", placeholder: "OpenAI Production" },
       { key: "account_identifier", label: "Organization ID", placeholder: "org-...", isIdentifier: true },
-      { key: "api_key_prefix", label: "API Key (first 8 chars)", placeholder: "sk-proj-..." },
     ],
   },
   {
@@ -60,7 +57,6 @@ const providers: ProviderFormConfig[] = [
       { key: "display_name", label: "Display Name", placeholder: "Production GCP" },
       { key: "account_identifier", label: "Project ID", placeholder: "my-project-123456", isIdentifier: true },
       { key: "region", label: "Default Region", placeholder: "us-central1" },
-      { key: "service_account", label: "Service Account Email", placeholder: "sa@project.iam.gserviceaccount.com" },
     ],
   },
 ];
