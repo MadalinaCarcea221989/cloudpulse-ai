@@ -9,6 +9,7 @@ interface TeamMember {
   email: string;
   phone: string;
   image: string;
+  linkedinQr: string;
 }
 
 const teamMembers: TeamMember[] = [
@@ -22,6 +23,7 @@ const teamMembers: TeamMember[] = [
     email: "madalina@cloudpulse.io",
     phone: "+31 6 4353 8696",
     image: "/Madalina_profile.jpg",
+    linkedinQr: "/linkedin_qr_madalina-carcea.png",
   },
   {
     name: "Victoria Vicheva",
@@ -33,6 +35,7 @@ const teamMembers: TeamMember[] = [
     email: "victoria@cloudpulse.io",
     phone: "+31 6 1755 5114",
     image: "/Vic_profile.jpg",
+    linkedinQr: "/linkedin_qr_victoria-vicheva.png",
   },
 ];
 
@@ -68,8 +71,8 @@ const TeamSection = () => {
               <p className="text-sm text-muted-foreground text-center mb-6">{member.description}</p>
 
               {/* QR Code Placeholder */}
-              <div className="w-20 h-20 mx-auto mb-4 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-xs text-cloud-dark font-mono">LinkedIn QR</span>
+              <div className="w-20 h-20 mx-auto mb-4 rounded-lg overflow-hidden">
+                <img src={member.linkedinQr} alt={`${member.name} LinkedIn QR`} className="w-full h-full object-contain" />
               </div>
 
               {/* Contact Links */}
