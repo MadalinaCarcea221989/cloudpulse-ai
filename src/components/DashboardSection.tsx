@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Brain, Server, Cloud as CloudIcon, Cpu, Sparkles } from "lucide-react";
 import IncidentCard, { Incident } from "./IncidentCard";
 import IncidentDetailModal from "./IncidentDetailModal";
-import ConnectInfrastructureModal from "./ConnectInfrastructureModal";
 import { toast } from "sonner";
 
 const mockIncidents: Incident[] = [
@@ -100,7 +99,6 @@ const providerConfig = {
 const DashboardSection = () => {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [hasTriggeredDemo, setHasTriggeredDemo] = useState(false);
-  const [connectModalOpen, setConnectModalOpen] = useState(false);
 
   // Demo mode - trigger notification after 3 seconds
   useEffect(() => {
@@ -194,10 +192,7 @@ const DashboardSection = () => {
 
         {/* Connect Infrastructure Button */}
         <div className="mt-12 text-center">
-          <button
-            onClick={() => setConnectModalOpen(true)}
-            className="glass-card px-8 py-4 text-lg font-semibold text-cloud-light hover:bg-primary/30 transition-all inline-flex items-center gap-3"
-          >
+          <button className="glass-card px-8 py-4 text-lg font-semibold text-cloud-light hover:bg-primary/30 transition-all inline-flex items-center gap-3">
             <CloudIcon className="w-5 h-5" />
             Connect Your Infrastructure
           </button>
@@ -209,10 +204,6 @@ const DashboardSection = () => {
         incident={selectedIncident}
         open={!!selectedIncident}
         onClose={() => setSelectedIncident(null)}
-      />
-      <ConnectInfrastructureModal
-        open={connectModalOpen}
-        onClose={() => setConnectModalOpen(false)}
       />
     </section>
   );

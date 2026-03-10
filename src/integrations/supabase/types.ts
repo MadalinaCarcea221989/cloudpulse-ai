@@ -14,45 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      cloud_connections: {
-        Row: {
-          account_identifier: string | null
-          created_at: string
-          display_name: string
-          id: string
-          metadata: Json | null
-          provider: Database["public"]["Enums"]["cloud_provider"]
-          region: string | null
-          status: Database["public"]["Enums"]["connection_status"]
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          account_identifier?: string | null
-          created_at?: string
-          display_name: string
-          id?: string
-          metadata?: Json | null
-          provider: Database["public"]["Enums"]["cloud_provider"]
-          region?: string | null
-          status?: Database["public"]["Enums"]["connection_status"]
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          account_identifier?: string | null
-          created_at?: string
-          display_name?: string
-          id?: string
-          metadata?: Json | null
-          provider?: Database["public"]["Enums"]["cloud_provider"]
-          region?: string | null
-          status?: Database["public"]["Enums"]["connection_status"]
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       profiles: {
         Row: {
           account_type: Database["public"]["Enums"]["account_type"]
@@ -123,8 +84,6 @@ export type Database = {
     Enums: {
       account_type: "individual" | "company_partner"
       app_role: "admin" | "user"
-      cloud_provider: "aws" | "azure" | "openai" | "gcp"
-      connection_status: "connected" | "disconnected" | "error"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -254,8 +213,6 @@ export const Constants = {
     Enums: {
       account_type: ["individual", "company_partner"],
       app_role: ["admin", "user"],
-      cloud_provider: ["aws", "azure", "openai", "gcp"],
-      connection_status: ["connected", "disconnected", "error"],
     },
   },
 } as const
