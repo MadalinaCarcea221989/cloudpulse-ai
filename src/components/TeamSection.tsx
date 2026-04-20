@@ -9,6 +9,7 @@ interface TeamMember {
   email: string;
   phone: string;
   image: string;
+  linkedinQr: string;
 }
 
 const teamMembers: TeamMember[] = [
@@ -21,7 +22,8 @@ const teamMembers: TeamMember[] = [
     portfolio: "https://madalinacarcea221989.github.io/portfolio/",
     email: "madalina@cloudpulse.io",
     phone: "+31 6 4353 8696",
-    image: "/placeholder.svg",
+    image: "/Madalina_profile.jpg",
+    linkedinQr: "/linkedin_qr_madalina-carcea.png",
   },
   {
     name: "Victoria Vicheva",
@@ -32,7 +34,8 @@ const teamMembers: TeamMember[] = [
     portfolio: "https://victoria.dev",
     email: "victoria@cloudpulse.io",
     phone: "+31 6 1755 5114",
-    image: "/placeholder.svg",
+    image: "/Vic_profile.jpg",
+    linkedinQr: "/linkedin_qr_victoria-vicheva.png",
   },
 ];
 
@@ -52,12 +55,9 @@ const TeamSection = () => {
         <div className="grid md:grid-cols-2 gap-8">
           {teamMembers.map((member) => (
             <div key={member.name} className="glass-card p-6 group hover:scale-[1.02] transition-all">
-              {/* Photo Placeholder */}
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cloud-blue to-cloud-light mx-auto mb-4 flex items-center justify-center text-2xl font-bold text-cloud-dark">
-                {member.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
+              {/* Profile Photo */}
+              <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden border-2 border-cloud-blue/30">
+                <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
               </div>
 
               {/* Info */}
@@ -71,8 +71,8 @@ const TeamSection = () => {
               <p className="text-sm text-muted-foreground text-center mb-6">{member.description}</p>
 
               {/* QR Code Placeholder */}
-              <div className="w-20 h-20 mx-auto mb-4 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-xs text-cloud-dark font-mono">LinkedIn QR</span>
+              <div className="w-32 h-32 mx-auto mb-4 rounded-lg overflow-hidden bg-white p-2">
+                <img src={member.linkedinQr} alt={`${member.name} LinkedIn QR`} className="w-full h-full object-contain" />
               </div>
 
               {/* Contact Links */}
