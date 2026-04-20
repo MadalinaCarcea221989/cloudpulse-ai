@@ -12,7 +12,7 @@ const Index = () => {
     <div className="relative min-h-screen">
       <CloudBackground />
       <Navigation />
-      
+
       <main className="relative z-10">
         <HeroSection />
         {user && (

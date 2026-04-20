@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import CloudBackground from "@/components/CloudBackground";
 import Navigation from "@/components/Navigation";
-import { 
-  Shield, 
-  Zap, 
-  BarChart3, 
-  AlertTriangle, 
-  Cpu, 
+import {
+  Shield,
+  Zap,
+  BarChart3,
+  AlertTriangle,
+  Cpu,
   Clock,
   ArrowRight,
   CheckCircle,
@@ -58,7 +58,7 @@ const Overview = () => {
     <div className="relative min-h-screen">
       <CloudBackground />
       <Navigation />
-      
+
       <main className="relative z-10 pt-24 pb-16">
         {/* Hero Section */}
         <section className="px-6 mb-20">
@@ -67,13 +67,13 @@ const Overview = () => {
               <Shield className="w-4 h-4 text-cloud-light" />
               <span className="text-sm text-cloud-light font-medium">Platform Overview</span>
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl font-bold mb-6 text-foreground">
               What is <span className="text-primary">CloudPulse</span>?
             </h1>
-            
+
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              CloudPulse is an AI-powered multi-cloud incident monitoring dashboard designed for SREs and DevOps teams. 
+              CloudPulse is an AI-powered multi-cloud incident monitoring dashboard designed for SREs and DevOps teams.
               We aggregate incidents from multiple cloud providers, providing real-time monitoring, AI analysis, and automated remediation guidance.
             </p>
 
@@ -93,7 +93,7 @@ const Overview = () => {
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-foreground">
               Unified Monitoring Across Providers
             </h2>
-            
+
             <div className="grid md:grid-cols-3 gap-6">
               {providers.map((provider) => (
                 <div key={provider.name} className="glass-card p-8 text-center">
@@ -119,7 +119,7 @@ const Overview = () => {
             <p className="text-muted-foreground text-center mb-12 max-w-2xl mx-auto">
               Everything you need to monitor, analyze, and resolve cloud incidents faster.
             </p>
-            
+
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {features.map((feature) => (
                 <div key={feature.title} className="glass-card p-6 hover:bg-card/60 transition-colors">
@@ -138,7 +138,7 @@ const Overview = () => {
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-foreground">
               How CloudPulse Works
             </h2>
-            
+
             <div className="space-y-6">
               {[
                 { step: 1, title: "Connect Your Infrastructure", description: "Link your AWS, Azure, or OpenAI accounts to start monitoring." },
@@ -167,7 +167,7 @@ const Overview = () => {
               <Zap className="w-8 h-8 text-primary" />
               <h2 className="text-2xl md:text-3xl font-bold text-foreground">Built for SREs & DevOps</h2>
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-6">
               {[
                 "Reduce MTTR with AI-powered insights",

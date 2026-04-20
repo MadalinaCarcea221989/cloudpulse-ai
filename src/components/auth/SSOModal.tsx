@@ -67,7 +67,7 @@ const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
               onChange={(e) => setDomain(e.target.value)}
               className="h-12 pl-4 pr-4 text-base bg-secondary/50 border-border focus:border-primary text-foreground"
             />
-            
+
             {filteredSuggestions.length > 0 && (
               <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border rounded-lg shadow-card overflow-hidden z-10">
                 {filteredSuggestions.map((suggestion) => (

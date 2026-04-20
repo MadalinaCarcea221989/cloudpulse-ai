@@ -8,7 +8,7 @@ const HeroSection = () => {
 
   const handleExploreDashboard = () => {
     if (loading) return;
-    
+
     if (user) {
       document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth" });
     } else {
@@ -41,7 +41,7 @@ const HeroSection = () => {
 
         {/* Description */}
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-12 fade-in-delay-3">
-          AI-powered monitoring for AWS, Azure, and OpenAI with real-time alerts 
+          AI-powered monitoring for AWS, Azure, and OpenAI with real-time alerts
           and automated remediation. Unified visibility for DevOps teams.
         </p>
 

@@ -75,10 +75,10 @@ BEGIN
     COALESCE(NEW.raw_user_meta_data ->> 'full_name', NEW.raw_user_meta_data ->> 'name'),
     NEW.raw_user_meta_data ->> 'avatar_url'
   );
-  
+
   INSERT INTO public.user_roles (user_id, role)
   VALUES (NEW.id, 'user');
-  
+
   RETURN NEW;
 END;
 $$;

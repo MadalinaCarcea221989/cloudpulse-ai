@@ -90,15 +90,15 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
             </div>
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>
-                <strong className="text-foreground">What broke:</strong> The {incident.service} function in {incident.region} experienced 
+                <strong className="text-foreground">What broke:</strong> The {incident.service} function in {incident.region} experienced
                 elevated error rates due to timeout issues connecting to downstream services.
               </p>
               <p>
-                <strong className="text-foreground">User impact:</strong> Approximately 15% of API requests failed during peak traffic, 
+                <strong className="text-foreground">User impact:</strong> Approximately 15% of API requests failed during peak traffic,
                 affecting real-time data processing pipelines.
               </p>
               <p>
-                <strong className="text-foreground">What to monitor:</strong> Watch CloudWatch metrics for Lambda duration and 
+                <strong className="text-foreground">What to monitor:</strong> Watch CloudWatch metrics for Lambda duration and
                 concurrent executions. Alert if p99 latency exceeds 5 seconds.
               </p>
             </div>
