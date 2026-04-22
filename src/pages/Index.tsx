@@ -24,9 +24,10 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 py-8 px-6 border-t border-cloud-blue/20">
-        <div className="max-w-7xl mx-auto text-center text-sm text-muted-foreground">
-          <p>© 2025 CloudPulse. Where intelligence meets infrastructure.</p>
+      <footer className="relative z-10 py-10 px-6 border-t border-white/[0.06]">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground/80">
+          <p className="tracking-wide">© 2025 CloudPulse</p>
+          <p className="tracking-wide">Where intelligence meets infrastructure.</p>
         </div>
       </footer>
     </div>
