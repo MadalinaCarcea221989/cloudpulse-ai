@@ -37,27 +37,27 @@ const IncidentCard = ({ incident, onClick }: IncidentCardProps) => {
   return (
     <div
       onClick={onClick}
-      className="glass-card p-4 cursor-pointer hover:bg-white/5 transition-all hover:scale-[1.02] group"
+      className="glass-card p-5 cursor-pointer hover:bg-white/[0.03] hover:border-white/[0.12] transition-all duration-300 group"
     >
       {/* Header */}
       <div className="flex items-start justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <StatusIcon className={`w-4 h-4 ${statusConfig[incident.status].color}`} />
-          <span className="text-sm text-muted-foreground capitalize">{incident.status}</span>
+        <div className="flex items-center gap-1.5">
+          <StatusIcon className={`w-3.5 h-3.5 ${statusConfig[incident.status].color}`} />
+          <span className="text-[11px] uppercase tracking-wider text-muted-foreground capitalize">{incident.status}</span>
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full ${severityConfig[incident.severity].class}`}>
+        <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-medium ${severityConfig[incident.severity].class}`}>
           {severityConfig[incident.severity].label}
         </span>
       </div>
 
       {/* Service & Title */}
-      <h4 className="font-semibold text-foreground mb-1 group-hover:text-cloud-light transition-colors">
+      <h4 className="font-semibold text-foreground text-sm mb-1.5 group-hover:text-cloud-light transition-colors">
         {incident.service}
       </h4>
-      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{incident.title}</p>
+      <p className="text-xs text-muted-foreground line-clamp-2 mb-4 leading-relaxed">{incident.title}</p>
 
       {/* Footer */}
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
+      <div className="flex items-center justify-between text-[11px] text-muted-foreground/80">
         <span>{incident.region}</span>
         <span>{formatDistanceToNow(incident.timestamp, { addSuffix: true })}</span>
       </div>

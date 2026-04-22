@@ -127,35 +127,49 @@ const DashboardSection = () => {
   };
 
   return (
-    <section id="dashboard" className="relative py-24 px-6">
-      <div className="max-w-7xl mx-auto">
+    <section id="dashboard" className="relative py-32 px-6 overflow-hidden">
+      {/* Watermark */}
+      <span className="section-watermark top-8" aria-hidden="true">incidents</span>
+
+      <div className="relative max-w-7xl mx-auto">
+        {/* Section Header */}
+        <div className="text-center mb-14">
+          <span className="eyebrow">Live operations</span>
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground mt-3 mb-3">
+            Your infrastructure, <span className="chrome-text">in one pane</span>
+          </h2>
+          <p className="text-muted-foreground max-w-xl mx-auto text-sm md:text-base">
+            Real-time incident streams from every cloud, triaged by AI before you even look.
+          </p>
+        </div>
+
         {/* Weekly Intelligence Panel */}
-        <div className="glass-card p-6 mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Brain className="w-5 h-5 text-cloud-light" />
-            <h2 className="text-lg font-semibold text-cloud-light">Weekly Intelligence</h2>
-            <Sparkles className="w-4 h-4 text-cloud-sky ml-1" />
+        <div className="glass-card p-6 md:p-8 mb-10">
+          <div className="flex items-center gap-2 mb-6">
+            <Brain className="w-4 h-4 text-cloud-light" />
+            <h2 className="text-sm font-semibold text-cloud-light tracking-wide uppercase">Weekly Intelligence</h2>
+            <Sparkles className="w-3.5 h-3.5 text-cloud-sky ml-1" />
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="space-y-2">
-              <h3 className="text-sm text-muted-foreground">Worst Performing</h3>
-              <p className="text-foreground font-medium">AWS Lambda</p>
-              <p className="text-xs text-muted-foreground">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="space-y-1.5">
+              <h3 className="eyebrow">Worst Performing</h3>
+              <p className="text-foreground font-medium text-lg">AWS Lambda</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 12 incidents this week, primarily timeout-related in us-east-1
               </p>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-sm text-muted-foreground">Service Hotspot</h3>
-              <p className="text-foreground font-medium">Database Services</p>
-              <p className="text-xs text-muted-foreground">
+            <div className="space-y-1.5">
+              <h3 className="eyebrow">Service Hotspot</h3>
+              <p className="text-foreground font-medium text-lg">Database Services</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 RDS and Cosmos DB showing 40% increased load patterns
               </p>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-sm text-muted-foreground">Detected Pattern</h3>
-              <p className="text-foreground font-medium">Peak Hour Correlation</p>
-              <p className="text-xs text-muted-foreground">
-                78% of incidents occur between 9AM-11AM EST during deployments
+            <div className="space-y-1.5">
+              <h3 className="eyebrow">Detected Pattern</h3>
+              <p className="text-foreground font-medium text-lg">Peak Hour Correlation</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                78% of incidents occur between 9AM–11AM EST during deployments
               </p>
             </div>
           </div>
@@ -171,10 +185,10 @@ const DashboardSection = () => {
             return (
               <div key={provider} className="space-y-4">
                 {/* Provider Header */}
-                <div className="flex items-center gap-2 pb-2 border-b border-cloud-blue/20">
-                  <ProviderIcon className={`w-5 h-5 ${config.color}`} />
-                  <h3 className="font-semibold text-foreground">{config.label}</h3>
-                  <span className="ml-auto text-sm text-muted-foreground">{incidents.length} incidents</span>
+                <div className="flex items-center gap-2 pb-3 border-b border-white/[0.06]">
+                  <ProviderIcon className={`w-4 h-4 ${config.color}`} />
+                  <h3 className="font-semibold text-foreground text-sm tracking-wide">{config.label}</h3>
+                  <span className="ml-auto text-xs text-muted-foreground">{incidents.length} incidents</span>
                 </div>
 
                 {/* Incident Cards */}
@@ -193,12 +207,12 @@ const DashboardSection = () => {
         </div>
 
         {/* Connect Infrastructure Button */}
-        <div className="mt-12 text-center">
+        <div className="mt-16 text-center">
           <button
             onClick={() => setConnectModalOpen(true)}
-            className="glass-card px-8 py-4 text-lg font-semibold text-cloud-light hover:bg-primary/30 transition-all inline-flex items-center gap-3"
+            className="glass-pill px-7 py-3 text-sm font-medium text-cloud-light hover:bg-primary/20 transition-all inline-flex items-center gap-2.5"
           >
-            <CloudIcon className="w-5 h-5" />
+            <CloudIcon className="w-4 h-4" />
             Connect Your Infrastructure
           </button>
         </div>
