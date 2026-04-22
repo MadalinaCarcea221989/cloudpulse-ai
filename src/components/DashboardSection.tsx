@@ -206,16 +206,6 @@ const DashboardSection = () => {
           })}
         </div>
 
-        {/* Connect Infrastructure Button */}
-        <div className="mt-16 text-center">
-          <button
-            onClick={() => setConnectModalOpen(true)}
-            className="glass-pill px-7 py-3 text-sm font-medium text-cloud-light hover:bg-primary/20 transition-all inline-flex items-center gap-2.5"
-          >
-            <CloudIcon className="w-4 h-4" />
-            Connect Your Infrastructure
-          </button>
-        </div>
       </div>
 
       {/* Incident Detail Modal */}
