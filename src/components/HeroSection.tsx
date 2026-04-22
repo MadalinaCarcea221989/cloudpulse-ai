@@ -1,20 +1,6 @@
-import { ArrowDown, Zap } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { Zap } from "lucide-react";
 
 const HeroSection = () => {
-  const navigate = useNavigate();
-  const { user, loading } = useAuth();
-
-  const handleExploreDashboard = () => {
-    if (loading) return;
-
-    if (user) {
-      document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      navigate("/auth");
-    }
-  };
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20">
@@ -41,19 +27,9 @@ const HeroSection = () => {
 
         {/* Description */}
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-12 fade-in-delay-3">
-          AI-powered monitoring for AWS, Azure, and OpenAI with real-time alerts
+          AI-powered monitoring for AWS, Azure, and GCP with real-time alerts
           and automated remediation. Unified visibility for DevOps teams.
         </p>
-
-        {/* CTA Button */}
-        <button
-          onClick={handleExploreDashboard}
-          disabled={loading}
-          className="group glass-card px-8 py-4 text-lg font-semibold text-cloud-light hover:bg-primary/30 transition-all inline-flex items-center gap-3 fade-in-delay-3 disabled:opacity-50"
-        >
-          Explore Dashboard
-          <ArrowDown className="w-5 h-5 group-hover:translate-y-1 transition-transform" />
-        </button>
       </div>
 
       {/* Scroll indicator */}

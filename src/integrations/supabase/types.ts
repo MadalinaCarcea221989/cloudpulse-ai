@@ -88,6 +88,86 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      incidents: {
+        Row: {
+          cloud_account_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          provider: string
+          provider_incident_id: string
+          raw_json: Json | null
+          region: string | null
+          resolved_at: string | null
+          service: string | null
+          severity: string | null
+          started_at: string | null
+          status: string | null
+          title: string | null
+        }
+        Insert: {
+          cloud_account_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          provider: string
+          provider_incident_id: string
+          raw_json?: Json | null
+          region?: string | null
+          resolved_at?: string | null
+          service?: string | null
+          severity?: string | null
+          started_at?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Update: {
+          cloud_account_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          provider?: string
+          provider_incident_id?: string
+          raw_json?: Json | null
+          region?: string | null
+          resolved_at?: string | null
+          service?: string | null
+          severity?: string | null
+          started_at?: string | null
+          status?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incidents_cloud_account_id_fkey"
+            columns: ["cloud_account_id"]
+            isOneToOne: false
+            referencedRelation: "cloud_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           account_type: Database["public"]["Enums"]["account_type"]
