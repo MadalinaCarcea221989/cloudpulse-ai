@@ -41,12 +41,16 @@ const teamMembers: TeamMember[] = [
 
 const TeamSection = () => {
   return (
-    <section id="team" className="relative py-24 px-6">
-      <div className="max-w-5xl mx-auto">
+    <section id="team" className="relative py-32 px-6 overflow-hidden">
+      <span className="section-watermark top-8" aria-hidden="true">team</span>
+      <div className="relative max-w-5xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold chrome-text mb-4">Meet the Team Behind CloudPulse</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <span className="eyebrow">The makers</span>
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground mt-3 mb-4">
+            Meet the team behind <span className="chrome-text">CloudPulse</span>
+          </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto text-sm md:text-base">
             Two data science students building the future of cloud infrastructure monitoring.
           </p>
         </div>
