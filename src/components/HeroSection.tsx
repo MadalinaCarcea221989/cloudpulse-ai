@@ -1,20 +1,6 @@
-import { ArrowDown, Zap } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { Zap } from "lucide-react";
 
 const HeroSection = () => {
-  const navigate = useNavigate();
-  const { user, loading } = useAuth();
-
-  const handleExploreDashboard = () => {
-    if (loading) return;
-
-    if (user) {
-      document.getElementById("dashboard")?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      navigate("/auth");
-    }
-  };
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20">
