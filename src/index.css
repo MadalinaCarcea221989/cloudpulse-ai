@@ -89,8 +89,23 @@
 
 @layer components {
   .glass-card {
-    @apply bg-gradient-to-br from-cloud-navy/40 to-cloud-dark/60 backdrop-blur-xl border border-cloud-blue/20 rounded-xl;
+    @apply bg-gradient-to-br from-cloud-navy/30 to-cloud-dark/50 backdrop-blur-xl border border-white/[0.06] rounded-2xl;
     box-shadow: var(--shadow-card);
+  }
+
+  .glass-pill {
+    @apply bg-cloud-dark/60 backdrop-blur-xl border border-white/[0.06] rounded-full;
+    box-shadow: 0 4px 24px hsl(210 100% 5% / 0.4);
+  }
+
+  .section-watermark {
+    @apply absolute left-1/2 -translate-x-1/2 select-none pointer-events-none font-black tracking-tighter text-foreground/[0.04];
+    font-size: clamp(8rem, 22vw, 20rem);
+    line-height: 0.8;
+  }
+
+  .eyebrow {
+    @apply text-xs uppercase tracking-[0.2em] text-cloud-sky/80 font-medium;
   }
 
   .chrome-text {
@@ -125,23 +140,23 @@
     filter: drop-shadow(0 4px 8px hsl(210 100% 10% / 0.6))
             drop-shadow(0 8px 25px hsl(210 80% 55% / 0.4))
             drop-shadow(0 0 60px hsl(210 80% 60% / 0.3));
-    letter-spacing: -0.03em;
+    letter-spacing: -0.04em;
   }
 
   .severity-critical {
-    @apply bg-red-500/20 text-red-400 border border-red-500/30;
+    @apply bg-red-500/15 text-red-400 border border-red-500/25;
   }
 
   .severity-high {
-    @apply bg-orange-500/20 text-orange-400 border border-orange-500/30;
+    @apply bg-orange-500/15 text-orange-400 border border-orange-500/25;
   }
 
   .severity-medium {
-    @apply bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
+    @apply bg-yellow-500/15 text-yellow-400 border border-yellow-500/25;
   }
 
   .severity-low {
-    @apply bg-green-500/20 text-green-400 border border-green-500/30;
+    @apply bg-green-500/15 text-green-400 border border-green-500/25;
   }
 }
 
