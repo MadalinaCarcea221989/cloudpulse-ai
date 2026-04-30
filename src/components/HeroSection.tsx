@@ -16,7 +16,7 @@ const HeroSection = () => {
 
         {/* Main Title */}
         <h1 className="text-7xl md:text-9xl lg:text-[10rem] font-black tracking-tighter mb-8 chrome-text-3d fade-in-delay-2">
-          cloudpulse
+          CloudPulse
         </h1>
 
         {/* Tagline */}
@@ -26,7 +26,7 @@ const HeroSection = () => {
 
         {/* Description */}
         <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-10 fade-in-delay-3 leading-relaxed">
-          Real-time alerts and automated remediation across AWS, Azure, and GCP — unified visibility for modern DevOps teams.
+          One place to catch issues across AWS, Azure, and GCP, and fix them faster with your team.
         </p>
 
         {/* Provider chips */}
