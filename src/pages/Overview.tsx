@@ -175,6 +175,41 @@ const Overview = () => {
           </div>
         </section>
 
+        {/* Under the Hood */}
+        <section className="relative px-6 py-24 overflow-hidden">
+          <span className="section-watermark top-8" aria-hidden="true">engine</span>
+          <div className="relative max-w-4xl mx-auto">
+            <div className="text-center mb-14">
+              <span className="eyebrow">Under the hood</span>
+              <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground mt-3">
+                How the <span className="chrome-text">data and AI</span> work
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5">
+              <div className="glass-card p-6">
+                <Layers className="w-5 h-5 text-cloud-light mb-4" />
+                <h3 className="text-base font-semibold text-foreground mb-2">The data engineering layer</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Once you link an AWS, Azure or GCP account, CloudPulse pulls signals from each provider's native APIs (CloudWatch, Azure Monitor, Cloud Operations) on a schedule. The raw events flow into a normalised schema in our backend, so a Lambda timeout in us-east-1 and a Cosmos DB throttle in West Europe end up in the same shape. From there we group related events into incidents, attach metadata like region, service and severity, and store a rolling window of metrics so the dashboard, timeline and weekly intelligence panel can all read from one source of truth.
+                </p>
+              </div>
+
+              <div className="glass-card p-6">
+                <Sparkles className="w-5 h-5 text-cloud-light mb-4" />
+                <h3 className="text-base font-semibold text-foreground mb-2">The AI layer</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Each normalised incident is sent to a large language model through a backend function, together with the relevant logs and metrics as context. The model is prompted to act like a senior SRE and return a structured response: a short summary of what broke, the likely root cause, the user impact, what to keep watching, and a remediation plan split into immediate, short-term and long-term actions. CLI commands come back as ready-to-copy snippets. The weekly intelligence view runs a second pass over the last seven days of incidents to surface patterns, hotspots and worst-performing services.
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground/70 text-center mt-6 max-w-2xl mx-auto leading-relaxed">
+              The current build runs in high-fidelity demo mode with realistic mock data, so you can explore the full workflow without connecting live cloud accounts.
+            </p>
+          </div>
+        </section>
+
         {/* For Teams */}
         <section className="relative px-6 py-24 overflow-hidden">
           <div className="relative max-w-4xl mx-auto glass-card p-8 md:p-12">
