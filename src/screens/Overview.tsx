@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import CloudBackground from "@/components/CloudBackground";
 import Navigation from "@/components/Navigation";
 import {
@@ -81,7 +81,7 @@ const Overview = () => {
             </p>
 
             <Link
-              to="/auth"
+              href="/auth"
               className="inline-flex items-center gap-2 glass-pill px-6 py-3 text-sm font-medium text-cloud-light hover:bg-primary/20 transition-all fade-in-delay-3"
             >
               Get Started
@@ -250,7 +250,7 @@ const Overview = () => {
               Join DevOps teams who trust CloudPulse for their incident management.
             </p>
             <Link
-              to="/auth"
+              href="/auth"
               className="inline-flex items-center gap-2 glass-pill px-6 py-3 text-sm font-medium text-cloud-light hover:bg-primary/20 transition-all"
             >
               Get Started Free

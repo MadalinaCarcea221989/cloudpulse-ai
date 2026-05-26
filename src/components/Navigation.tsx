@@ -1,4 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Cloud, Users, Cable, LogIn, LogOut, User } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -11,7 +14,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Navigation = () => {
-  const location = useLocation();
+  const pathname = usePathname();
   const { user, loading, signOut } = useAuth();
 
   const handleSignOut = async () => {
@@ -22,7 +25,7 @@ const Navigation = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group">
+        <Link href="/" className="flex items-center gap-2 group">
           <Cloud className="w-6 h-6 text-cloud-light group-hover:text-white transition-colors" />
           <span className="text-base font-semibold tracking-tight text-foreground">CloudPulse</span>
         </Link>
@@ -30,9 +33,9 @@ const Navigation = () => {
         {/* Nav Links */}
         <div className="glass-pill px-1.5 py-1.5 flex items-center gap-0.5">
           <Link
-            to="/"
+            href="/"
             className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-              location.pathname === "/"
+              pathname === "/"
                 ? "bg-primary/20 text-cloud-light"
                 : "text-muted-foreground hover:text-foreground hover:bg-white/5"
             }`}
@@ -40,9 +43,9 @@ const Navigation = () => {
             Dashboard
           </Link>
           <Link
-            to="/overview"
+            href="/overview"
             className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-              location.pathname === "/overview"
+              pathname === "/overview"
                 ? "bg-primary/20 text-cloud-light"
                 : "text-muted-foreground hover:text-foreground hover:bg-white/5"
             }`}
@@ -51,9 +54,9 @@ const Navigation = () => {
           </Link>
           {user && (
             <Link
-              to="/connections"
+              href="/connections"
               className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
-                location.pathname === "/connections"
+                pathname === "/connections"
                   ? "bg-primary/20 text-cloud-light"
                   : "text-muted-foreground hover:text-foreground hover:bg-white/5"
               }`}
@@ -63,9 +66,9 @@ const Navigation = () => {
             </Link>
           )}
           <Link
-            to="/team"
+            href="/team"
             className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
-              location.pathname === "/team"
+              pathname === "/team"
                 ? "bg-primary/20 text-cloud-light"
                 : "text-muted-foreground hover:text-foreground hover:bg-white/5"
             }`}
@@ -104,7 +107,7 @@ const Navigation = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <Link to="/auth">
+          <Link href="/auth">
             <Button className="glass-pill px-4 py-1.5 h-auto text-xs font-medium text-cloud-light hover:bg-primary/20 transition-all">
               <LogIn className="w-3.5 h-3.5 mr-1.5" />
               Sign In

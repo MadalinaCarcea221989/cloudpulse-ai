@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Server, Cloud as CloudIcon, Cpu, Database, Plus, Trash2, Check, Loader2, Cable, Search, AlertTriangle, WifiOff } from "lucide-react";
 import CloudBackground from "@/components/CloudBackground";
@@ -7,7 +9,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ConnectInfrastructureModal from "@/components/ConnectInfrastructureModal";
-import { Navigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
 
 const providerMeta: Record<CloudProvider, { icon: React.ElementType; label: string; color: string; bgColor: string }> = {
@@ -26,11 +29,24 @@ const statusConfig: Record<ConnectionStatus, { icon: React.ElementType; label: s
 const Connections = () => {
   const { user, loading: authLoading } = useAuth();
   const { connections, loading, removeConnection } = useCloudConnections();
+  const router = useRouter();
   const [connectModalOpen, setConnectModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [removingId, setRemovingId] = useState<string | null>(null);
 
-  if (!authLoading && !user) return <Navigate to="/auth" replace />;
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace('/auth');
+    }
+  }, [authLoading, user, router]);
+
+  if (!authLoading && !user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const filtered = connections.filter(
     (c) =>

@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,7 +15,7 @@ import OnboardingStepper from '@/components/auth/OnboardingStepper';
 
 const Auth = () => {
   const { user, loading, signInWithGoogle, signInWithMicrosoft } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { toast } = useToast();
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [accountType, setAccountType] = useState<'individual' | 'company_partner'>('individual');
@@ -28,10 +30,10 @@ const Auth = () => {
       if (isNewUser) {
         setShowOnboarding(true);
       } else {
-        navigate('/');
+        router.push('/');
       }
     }
-  }, [user, loading, navigate, isNewUser]);
+  }, [user, loading, router, isNewUser]);
 
   const handleGoogleSignIn = async () => {
     setIsSigningIn(true);
@@ -140,7 +142,7 @@ const Auth = () => {
       title: 'Setup complete!',
       description: 'Your preferences have been saved.',
     });
-    navigate('/');
+    router.push('/');
   };
 
   if (loading) {

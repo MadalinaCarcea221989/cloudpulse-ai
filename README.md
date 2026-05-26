@@ -32,7 +32,7 @@ cd <YOUR_PROJECT_NAME>
 # Step 3: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Start the Next.js development server.
 npm run dev
 ```
 
@@ -54,7 +54,7 @@ npm run dev
 
 This project is built with:
 
-- Vite
+- Next.js
 - TypeScript
 - React
 - shadcn-ui
