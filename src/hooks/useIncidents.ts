@@ -97,7 +97,7 @@ function toIncident(row: SupabaseIncidentRow): Incident {
     status: mapStatus(row.status),
     title: row.title ?? row.description ?? "No description available",
     timestamp: new Date(row.started_at ?? row.created_at),
-    provider: mapProvider(row.provider),
+    provider: (row.provider ?? "unknown").toLowerCase(),
   };
 }
 
@@ -173,3 +173,4 @@ export function useIncidents(limit = 50): UseIncidentsResult {
 
   return { incidents, loading, error };
 }
+
