@@ -1,95 +1,10 @@
 import { useState, useEffect } from "react";
-import { Brain, Server, Cloud as CloudIcon, Cpu, Sparkles } from "lucide-react";
+import { Brain, Server, Cloud as CloudIcon, Cpu, Sparkles, Loader2 } from "lucide-react";
 import IncidentCard, { Incident } from "./IncidentCard";
 import IncidentDetailModal from "./IncidentDetailModal";
 import ConnectInfrastructureModal from "./ConnectInfrastructureModal";
 import { toast } from "sonner";
-
-const mockIncidents: Incident[] = [
-  // AWS
-  {
-    id: "aws-1",
-    service: "Lambda - OrderProcessor",
-    region: "us-east-1",
-    severity: "critical",
-    status: "investigating",
-    title: "Function timeouts exceeding threshold, 23% error rate detected",
-    timestamp: new Date(Date.now() - 15 * 60 * 1000),
-    provider: "aws",
-  },
-  {
-    id: "aws-2",
-    service: "RDS - ProductionDB",
-    region: "eu-west-1",
-    severity: "high",
-    status: "monitoring",
-    title: "High CPU utilization at 94%, read replica lag increasing",
-    timestamp: new Date(Date.now() - 45 * 60 * 1000),
-    provider: "aws",
-  },
-  {
-    id: "aws-3",
-    service: "S3 - MediaBucket",
-    region: "ap-southeast-1",
-    severity: "low",
-    status: "resolved",
-    title: "Temporary access latency resolved after bucket policy update",
-    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-    provider: "aws",
-  },
-  // Azure
-  {
-    id: "azure-1",
-    service: "App Service - WebAPI",
-    region: "East US",
-    severity: "high",
-    status: "investigating",
-    title: "Memory pressure causing frequent restarts, autoscale triggered",
-    timestamp: new Date(Date.now() - 30 * 60 * 1000),
-    provider: "azure",
-  },
-  {
-    id: "azure-2",
-    service: "Cosmos DB",
-    region: "West Europe",
-    severity: "medium",
-    status: "monitoring",
-    title: "Elevated RU consumption detected, throttling possible",
-    timestamp: new Date(Date.now() - 1 * 60 * 60 * 1000),
-    provider: "azure",
-  },
-  {
-    id: "azure-3",
-    service: "Functions - DataSync",
-    region: "Central US",
-    severity: "low",
-    status: "resolved",
-    title: "Cold start optimization applied, latency normalized",
-    timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
-    provider: "azure",
-  },
-  // OpenAI
-  {
-    id: "openai-1",
-    service: "GPT-4 API",
-    region: "Global",
-    severity: "medium",
-    status: "monitoring",
-    title: "Elevated response times during peak hours, 2.3s avg latency",
-    timestamp: new Date(Date.now() - 20 * 60 * 1000),
-    provider: "openai",
-  },
-  {
-    id: "openai-2",
-    service: "Embeddings API",
-    region: "Global",
-    severity: "low",
-    status: "resolved",
-    title: "Rate limit adjustments completed, throughput normalized",
-    timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000),
-    provider: "openai",
-  },
-];
+import { useIncidents } from "@/hooks/useIncidents";
 
 const providerConfig = {
   aws: { icon: Server, label: "AWS", color: "text-orange-400" },
@@ -99,31 +14,34 @@ const providerConfig = {
 
 const DashboardSection = () => {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
-  const [hasTriggeredDemo, setHasTriggeredDemo] = useState(false);
   const [connectModalOpen, setConnectModalOpen] = useState(false);
+  const [notifiedIds, setNotifiedIds] = useState<Set<string>>(new Set());
 
-  // Demo mode - trigger notification after 3 seconds
+  // Live data from Supabase — replaces hardcoded mockIncidents
+  const { incidents, loading, error } = useIncidents(50);
+
+  // Notify on new critical incidents arriving via Realtime
   useEffect(() => {
-    if (hasTriggeredDemo) return;
+    const newCritical = incidents.find(
+      (i) => i.severity === "critical" && !notifiedIds.has(i.id)
+    );
 
-    const timer = setTimeout(() => {
+    if (newCritical) {
       toast.error("New Critical Incident Detected", {
-        description: "Lambda - OrderProcessor experiencing elevated error rates in us-east-1",
+        description: `${newCritical.service} — ${newCritical.title.slice(0, 80)}`,
         action: {
           label: "View",
-          onClick: () => setSelectedIncident(mockIncidents[0]),
+          onClick: () => setSelectedIncident(newCritical),
         },
       });
-      setHasTriggeredDemo(true);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, [hasTriggeredDemo]);
+      setNotifiedIds((prev) => new Set([...prev, newCritical.id]));
+    }
+  }, [incidents, notifiedIds]);
 
   const groupedIncidents = {
-    aws: mockIncidents.filter((i) => i.provider === "aws"),
-    azure: mockIncidents.filter((i) => i.provider === "azure"),
-    openai: mockIncidents.filter((i) => i.provider === "openai"),
+    aws: incidents.filter((i) => i.provider === "aws"),
+    azure: incidents.filter((i) => i.provider === "azure"),
+    openai: incidents.filter((i) => i.provider === "openai"),
   };
 
   return (
@@ -152,63 +70,98 @@ const DashboardSection = () => {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="space-y-1.5">
-              <h3 className="eyebrow">Worst Performing</h3>
-              <p className="text-foreground font-medium text-lg">AWS Lambda</p>
+              <h3 className="eyebrow">Total Incidents</h3>
+              <p className="text-foreground font-medium text-lg">{incidents.length}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                12 incidents this week, primarily timeout-related in us-east-1
+                Live count from all monitored providers
               </p>
             </div>
             <div className="space-y-1.5">
-              <h3 className="eyebrow">Service Hotspot</h3>
-              <p className="text-foreground font-medium text-lg">Database Services</p>
+              <h3 className="eyebrow">Critical / High</h3>
+              <p className="text-foreground font-medium text-lg">
+                {incidents.filter((i) => i.severity === "critical" || i.severity === "high").length}
+              </p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                RDS and Cosmos DB showing 40% increased load patterns
+                Incidents requiring immediate attention
               </p>
             </div>
             <div className="space-y-1.5">
-              <h3 className="eyebrow">Detected Pattern</h3>
-              <p className="text-foreground font-medium text-lg">Peak Hour Correlation</p>
+              <h3 className="eyebrow">Resolved</h3>
+              <p className="text-foreground font-medium text-lg">
+                {incidents.filter((i) => i.status === "resolved").length}
+              </p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                78% of incidents occur between 9AM–11AM EST during deployments
+                Incidents resolved in current dataset
               </p>
             </div>
           </div>
         </div>
 
+        {/* Loading state */}
+        {loading && (
+          <div className="flex items-center justify-center py-20 gap-3 text-muted-foreground">
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span className="text-sm">Loading live incidents…</span>
+          </div>
+        )}
+
+        {/* Error state */}
+        {error && !loading && (
+          <div className="glass-card p-6 text-center text-red-400 text-sm">
+            Failed to load incidents: {error}
+          </div>
+        )}
+
+        {/* Empty state */}
+        {!loading && !error && incidents.length === 0 && (
+          <div className="glass-card p-6 text-center text-muted-foreground text-sm">
+            No incidents found. The pipeline may still be syncing data.
+          </div>
+        )}
+
         {/* Provider Columns */}
-        <div className="grid md:grid-cols-3 gap-6">
-          {(["aws", "azure", "openai"] as const).map((provider) => {
-            const config = providerConfig[provider];
-            const ProviderIcon = config.icon;
-            const incidents = groupedIncidents[provider];
+        {!loading && incidents.length > 0 && (
+          <div className="grid md:grid-cols-3 gap-6">
+            {(["aws", "azure", "openai"] as const).map((provider) => {
+              const config = providerConfig[provider];
+              const ProviderIcon = config.icon;
+              const providerIncidents = groupedIncidents[provider];
 
-            return (
-              <div key={provider} className="space-y-4">
-                {/* Provider Header */}
-                <div className="flex items-center gap-2 pb-3 border-b border-white/[0.06]">
-                  <ProviderIcon className={`w-4 h-4 ${config.color}`} />
-                  <h3 className="font-semibold text-foreground text-sm tracking-wide">{config.label}</h3>
-                  <span className="ml-auto text-xs text-muted-foreground">{incidents.length} incidents</span>
+              return (
+                <div key={provider} className="space-y-4">
+                  {/* Provider Header */}
+                  <div className="flex items-center gap-2 pb-3 border-b border-white/[0.06]">
+                    <ProviderIcon className={`w-4 h-4 ${config.color}`} />
+                    <h3 className="font-semibold text-foreground text-sm tracking-wide">{config.label}</h3>
+                    <span className="ml-auto text-xs text-muted-foreground">
+                      {providerIncidents.length} incidents
+                    </span>
+                  </div>
+
+                  {/* Incident Cards */}
+                  <div className="space-y-3">
+                    {providerIncidents.length === 0 ? (
+                      <p className="text-xs text-muted-foreground py-4 text-center">
+                        No incidents for this provider
+                      </p>
+                    ) : (
+                      providerIncidents.map((incident) => (
+                        <IncidentCard
+                          key={incident.id}
+                          incident={incident}
+                          onClick={() => setSelectedIncident(incident)}
+                        />
+                      ))
+                    )}
+                  </div>
                 </div>
-
-                {/* Incident Cards */}
-                <div className="space-y-3">
-                  {incidents.map((incident) => (
-                    <IncidentCard
-                      key={incident.id}
-                      incident={incident}
-                      onClick={() => setSelectedIncident(incident)}
-                    />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      {/* Incident Detail Modal */}
+      {/* Modals */}
       <IncidentDetailModal
         incident={selectedIncident}
         open={!!selectedIncident}
