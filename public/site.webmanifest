@@ -1,0 +1,29 @@
+{
+  "name": "CloudPulse",
+  "short_name": "CloudPulse",
+  "description": "AI-powered multi-cloud incident monitoring dashboard.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#041028",
+  "theme_color": "#06F0D3",
+  "icons": [
+    {
+      "src": "/favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
