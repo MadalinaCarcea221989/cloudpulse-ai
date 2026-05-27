@@ -42,21 +42,42 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl bg-cloud-dark border-cloud-blue/20 text-foreground max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
+      {/* FIX 2: overflow-hidden on the outer shell, overflow-y-auto on inner scroll container only */}
+      <DialogContent className="max-w-2xl bg-cloud-dark border-cloud-blue/20 text-foreground max-h-[90vh] overflow-hidden flex flex-col p-0">
+        
+        {/* Fixed header — never scrolls */}
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-cloud-blue/10 shrink-0">
           <DialogTitle className="text-xl font-bold text-cloud-light flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-red-400" />
             {incident.service}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 mt-4">
+        {/* Scrollable body — contained within modal bounds */}
+        <div className="overflow-y-auto flex-1 px-6 py-4 space-y-4">
+
           {/* Status Timeline */}
           <div className="glass-card p-4">
             <h3 className="text-sm font-semibold text-muted-foreground mb-4">Incident Timeline</h3>
-            <div className="flex items-center justify-between">
+            
+            {/* FIX 1: relative on this wrapper so absolute connectors are scoped here */}
+            <div className="relative flex items-start justify-between">
+              
+              {/* Connector lines drawn first, behind the icons */}
+              <div className="absolute top-4 left-0 right-0 flex px-4">
+                {statusSteps.slice(0, -1).map((_, index) => (
+                  <div
+                    key={index}
+                    className={`flex-1 h-0.5 mx-1 ${
+                      index < currentStepIndex ? "bg-primary" : "bg-muted"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Step icons on top of lines */}
               {statusSteps.map((step, index) => (
-                <div key={step} className="flex flex-col items-center flex-1">
+                <div key={step} className="relative flex flex-col items-center flex-1 z-10">
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
                       index <= currentStepIndex
@@ -70,13 +91,6 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
                     {step === "resolved" && <CheckCircle className="w-4 h-4" />}
                   </div>
                   <span className="text-xs capitalize text-muted-foreground">{step}</span>
-                  {index < statusSteps.length - 1 && (
-                    <div
-                      className={`absolute h-0.5 w-full top-4 left-1/2 ${
-                        index < currentStepIndex ? "bg-primary" : "bg-muted"
-                      }`}
-                    />
-                  )}
                 </div>
               ))}
             </div>
@@ -142,7 +156,6 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
                 <h3 className="text-sm font-semibold text-green-400">AI Remediation Plan</h3>
               </div>
 
-              {/* Immediate Actions */}
               <div>
                 <h4 className="text-xs font-semibold text-muted-foreground mb-2">IMMEDIATE ACTIONS</h4>
                 <div className="space-y-2">
@@ -152,7 +165,7 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
                         <code className="text-xs text-cloud-light flex-1 overflow-x-auto">{action.cmd}</code>
                         <button
                           onClick={() => copyCommand(action.cmd, index)}
-                          className="ml-2 p-1 hover:bg-white/10 rounded"
+                          className="ml-2 p-1 hover:bg-white/10 rounded shrink-0"
                         >
                           {copiedIndex === index ? (
                             <Check className="w-4 h-4 text-green-400" />
@@ -167,7 +180,6 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
                 </div>
               </div>
 
-              {/* Short-term Actions */}
               <div>
                 <h4 className="text-xs font-semibold text-muted-foreground mb-2">SHORT-TERM ACTIONS</h4>
                 <ul className="space-y-2">
@@ -180,7 +192,6 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
                 </ul>
               </div>
 
-              {/* Long-term Actions */}
               <div>
                 <h4 className="text-xs font-semibold text-muted-foreground mb-2">LONG-TERM ACTIONS</h4>
                 <ul className="space-y-2">
@@ -194,6 +205,9 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
               </div>
             </div>
           )}
+
+          {/* Bottom padding so last item isn't flush against edge */}
+          <div className="h-2" />
         </div>
       </DialogContent>
     </Dialog>
