@@ -61,63 +61,73 @@ const Auth = () => {
     }
   };
 
-  const handleEmailAuth = async (email: string, password: string, fullName?: string) => {
+  // ── KEY FIX: now returns { success, requiresConfirmation } and always resets isSigningIn ──
+  const handleEmailAuth = async (
+    email: string,
+    password: string,
+    fullName?: string
+  ): Promise<{ success: boolean; requiresConfirmation?: boolean }> => {
     if (!email || !password) {
       toast({
         title: 'Missing fields',
         description: 'Please enter both email and password.',
         variant: 'destructive',
       });
-      return;
+      return { success: false };
     }
 
     setIsSigningIn(true);
 
-    if (emailMode === 'signin') {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        toast({
-          title: 'Sign in failed',
-          description: error.message,
-          variant: 'destructive',
-        });
-        setIsSigningIn(false);
-      }
-    } else {
-      if (password.length < 6) {
-        toast({
-          title: 'Password too short',
-          description: 'Password must be at least 6 characters.',
-          variant: 'destructive',
-        });
-        setIsSigningIn(false);
-        return;
-      }
+    try {
+      if (emailMode === 'signin') {
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) {
+          toast({
+            title: 'Sign in failed',
+            description: error.message,
+            variant: 'destructive',
+          });
+          return { success: false };
+        }
+        return { success: true };
 
-      const redirectUrl = `${window.location.origin}/`;
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: { full_name: fullName },
-        },
-      });
-
-      if (error) {
-        toast({
-          title: 'Sign up failed',
-          description: error.message,
-          variant: 'destructive',
-        });
-        setIsSigningIn(false);
       } else {
-        setIsNewUser(true);
-        toast({
-          title: 'Account created!',
-          description: 'Welcome aboard.',
+        if (password.length < 6) {
+          toast({
+            title: 'Password too short',
+            description: 'Password must be at least 6 characters.',
+            variant: 'destructive',
+          });
+          return { success: false };
+        }
+
+        const redirectUrl = `${window.location.origin}/`;
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: redirectUrl,
+            data: { full_name: fullName },
+          },
         });
+
+        if (error) {
+          toast({
+            title: 'Sign up failed',
+            description: error.message,
+            variant: 'destructive',
+          });
+          return { success: false };
+        }
+
+        // Don't show toast here — EmailAuthForm shows the confirmation screen instead
+        setIsNewUser(true);
+        return { success: true, requiresConfirmation: true };
       }
+
+    } finally {
+      // ── Always runs, always stops the spinner ──
+      setIsSigningIn(false);
     }
   };
 
@@ -130,13 +140,14 @@ const Auth = () => {
           .eq('user_id', user.id);
       }
     };
-
-    if (user) {
-      updateAccountType();
-    }
+    if (user) updateAccountType();
   }, [user, accountType]);
 
-  const handleOnboardingComplete = async (data: { role: string; infoTypes: string[]; preferences: object }) => {
+  const handleOnboardingComplete = async (data: {
+    role: string;
+    infoTypes: string[];
+    preferences: object;
+  }) => {
     console.log('Onboarding completed:', data);
     toast({
       title: 'Setup complete!',
