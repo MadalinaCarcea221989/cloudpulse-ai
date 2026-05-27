@@ -203,10 +203,6 @@ const Overview = () => {
                 </p>
               </div>
             </div>
-
-            <p className="text-xs text-muted-foreground/70 text-center mt-6 max-w-2xl mx-auto leading-relaxed">
-              The current build runs in high-fidelity demo mode with realistic mock data, so you can explore the full workflow without connecting live cloud accounts.
-            </p>
           </div>
         </section>
 

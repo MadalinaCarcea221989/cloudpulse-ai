@@ -32,24 +32,31 @@ export function useCloudConnections() {
   const [loading, setLoading] = useState(true);
 
   const fetchConnections = useCallback(async () => {
-    if (!user) {
-      setConnections([]);
-      setLoading(false);
-      return;
-    }
+    setLoading(true);
+    try {
+      if (!user) {
+        setConnections([]);
+        return;
+      }
 
-    const { data, error } = await supabase
-      .from("cloud_connections")
-      .select("*")
-      .order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("cloud_connections")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Failed to fetch connections:", error);
-      toast.error("Failed to load connections");
-    } else {
+      if (error) {
+        console.error("Failed to fetch connections:", error);
+        toast.error("Failed to load connections");
+        return;
+      }
+
       setConnections((data as unknown as CloudConnection[]) ?? []);
+    } catch (err) {
+      console.error("Failed to fetch connections:", err);
+      toast.error("Failed to load connections");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [user]);
 
   useEffect(() => {

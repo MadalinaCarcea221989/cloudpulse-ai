@@ -88,7 +88,7 @@ const Connections = () => {
                 Manage all your connected cloud providers in one place
               </p>
             </div>
-            <Button onClick={() => setConnectModalOpen(true)} className="gap-2">
+            <Button onClick={() => setConnectModalOpen(true)} className="gap-2" data-testid="connections-add-button">
               <Plus className="w-4 h-4" />
               Add Connection
             </Button>
@@ -147,6 +147,7 @@ const Connections = () => {
               placeholder="Search connections..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              data-testid="connections-search"
               className="pl-10 bg-secondary/50 border-cloud-blue/20"
             />
           </div>
@@ -190,6 +191,7 @@ const Connections = () => {
                       {items.map((conn) => (
                         <div
                           key={conn.id}
+                          data-testid={`connection-row-${conn.id}`}
                           className="glass-card p-4 flex items-center justify-between group hover:border-cloud-blue/40 transition-colors"
                         >
                           <div className="flex items-center gap-4 min-w-0">

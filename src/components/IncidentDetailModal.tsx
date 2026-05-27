@@ -1,7 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Incident } from "./IncidentCard";
-import { AlertTriangle, Activity, Clock, CheckCircle, Zap, Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { AlertTriangle, Activity, Clock, CheckCircle, Zap, Copy, Check, Loader2 } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface IncidentDetailModalProps {
   incident: Incident | null;
@@ -9,61 +11,154 @@ interface IncidentDetailModalProps {
   onClose: () => void;
 }
 
+interface AnalysisData {
+  whatBroke: string;
+  userImpact: string;
+  whatToMonitor: string;
+  revenueLossEstimate?: string;
+}
+
+interface RemediationData {
+  immediateActions: { cmd: string; time: string }[];
+  shortTerm: string[];
+  longTerm: string[];
+}
+
 const statusSteps = ["detected", "investigating", "monitoring", "resolved"];
 
 const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalProps) => {
   const [showRemediation, setShowRemediation] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { toast } = useToast();
+
+  // AI Analysis states
+  const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+
+  // Remediation states
+  const [remediation, setRemediation] = useState<RemediationData | null>(null);
+  const [remediationLoading, setRemediationLoading] = useState(false);
+  const [remediationError, setRemediationError] = useState<string | null>(null);
+
+  const fetchAnalysis = useCallback(async (inc: Incident) => {
+    setAnalysisLoading(true);
+    setAnalysisError(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-incident', {
+        body: { incident: inc, includeRemediation: false }
+      });
+
+      if (error) throw error;
+      setAnalysis(data as AnalysisData);
+    } catch (err) {
+      console.error('Failed to fetch analysis:', err);
+      setAnalysisError("Analysis unavailable — check back shortly");
+    } finally {
+      setAnalysisLoading(false);
+    }
+  }, []);
+
+  const generateRemediation = async () => {
+    if (!incident) return;
+    setRemediationLoading(true);
+    setRemediationError(null);
+    setShowRemediation(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-incident', {
+        body: { incident, includeRemediation: true }
+      });
+
+      if (error) throw error;
+      setRemediation(data as RemediationData);
+    } catch (err) {
+      console.error('Failed to generate remediation:', err);
+      setRemediationError("Remediation plan unavailable");
+    } finally {
+      setRemediationLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (open && incident) {
+      fetchAnalysis(incident);
+      // Reset remediation state when switching incidents
+      setRemediation(null);
+      setShowRemediation(false);
+      setRemediationError(null);
+    }
+  }, [open, incident, fetchAnalysis]);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+        copyTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   if (!incident) return null;
 
   const currentStepIndex = statusSteps.indexOf(incident.status);
 
-  const copyCommand = (cmd: string, index: number) => {
-    navigator.clipboard.writeText(cmd);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
+  const copyCommand = async (cmd: string, index: number) => {
+    try {
+      await navigator.clipboard.writeText(cmd);
+      setCopiedIndex(index);
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+      copyTimeoutRef.current = setTimeout(() => setCopiedIndex(null), 2000);
+      toast({
+        title: "Command copied",
+        description: "CLI command copied to clipboard.",
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unable to copy command.";
+      toast({
+        title: "Copy failed",
+        description: message,
+        variant: "destructive",
+      });
+    }
   };
 
-  const remediationActions = {
-    immediate: [
-      { cmd: `aws lambda update-function-configuration --function-name ${incident.service} --timeout 30`, time: "2 min" },
-      { cmd: `aws cloudwatch put-metric-alarm --alarm-name "${incident.service}-errors"`, time: "1 min" },
-    ],
-    shortTerm: [
-      "Implement circuit breaker pattern for downstream calls",
-      "Add request throttling at API Gateway level",
-    ],
-    longTerm: [
-      "Migrate to provisioned concurrency for predictable workloads",
-      "Implement multi-region failover architecture",
-    ],
-  };
+  // Impact Analysis logic
+  const errorRate = incident.raw_json?.impact?.error_rate || incident.raw_json?.error_rate || "N/A";
+  const avgLatency = incident.raw_json?.impact?.latency_p99 || incident.raw_json?.latency || "N/A";
+  const affectedRequests = incident.raw_json?.impact?.affected_requests || incident.raw_json?.affected || "N/A";
+  
+  const showImpactAnalysis = errorRate !== "N/A" || avgLatency !== "N/A" || affectedRequests !== "N/A";
+
+  const AnalysisSkeleton = () => (
+    <div className="space-y-3">
+      <div className="h-4 w-full bg-muted/50 rounded animate-pulse" />
+      <div className="h-4 w-5/6 bg-muted/50 rounded animate-pulse" />
+      <div className="h-4 w-4/6 bg-muted/50 rounded animate-pulse" />
+    </div>
+  );
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      {/* FIX 2: overflow-hidden on the outer shell, overflow-y-auto on inner scroll container only */}
-      <DialogContent className="max-w-2xl bg-cloud-dark border-cloud-blue/20 text-foreground max-h-[90vh] overflow-hidden flex flex-col p-0">
-        
-        {/* Fixed header — never scrolls */}
+      <DialogContent
+        className="max-w-2xl bg-cloud-dark border-cloud-blue/20 text-foreground max-h-[90vh] overflow-hidden flex flex-col p-0"
+        data-testid="incident-detail-modal"
+      >
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-cloud-blue/10 shrink-0">
-          <DialogTitle className="text-xl font-bold text-cloud-light flex items-center gap-2">
+          <DialogTitle className="text-xl font-bold text-cloud-light flex items-center gap-2" data-testid="incident-modal-title">
             <AlertTriangle className="w-5 h-5 text-red-400" />
             {incident.service}
           </DialogTitle>
         </DialogHeader>
 
-        {/* Scrollable body — contained within modal bounds */}
         <div className="overflow-y-auto flex-1 px-6 py-4 space-y-4">
 
           {/* Status Timeline */}
           <div className="glass-card p-4">
             <h3 className="text-sm font-semibold text-muted-foreground mb-4">Incident Timeline</h3>
-            
-            {/* FIX 1: relative on this wrapper so absolute connectors are scoped here */}
             <div className="relative flex items-start justify-between">
-              
-              {/* Connector lines drawn first, behind the icons */}
               <div className="absolute top-4 left-0 right-0 flex px-4">
                 {statusSteps.slice(0, -1).map((_, index) => (
                   <div
@@ -75,9 +170,13 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
                 ))}
               </div>
 
-              {/* Step icons on top of lines */}
               {statusSteps.map((step, index) => (
-                <div key={step} className="relative flex flex-col items-center flex-1 z-10">
+                <div
+                  key={step}
+                  className="relative flex flex-col items-center flex-1 z-10"
+                  data-testid={`timeline-step-${step}`}
+                  data-active={index <= currentStepIndex}
+                >
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
                       index <= currentStepIndex
@@ -97,116 +196,146 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
           </div>
 
           {/* AI Analysis */}
-          <div className="glass-card p-4">
+          <div className="glass-card p-4 min-h-[140px]">
             <div className="flex items-center gap-2 mb-3">
               <Zap className="w-4 h-4 text-cloud-light" />
               <h3 className="text-sm font-semibold text-cloud-light">AI Analysis</h3>
+              {analysisLoading && <Loader2 className="w-3 h-3 animate-spin text-cloud-sky" />}
             </div>
-            <div className="space-y-3 text-sm text-muted-foreground">
-              <p>
-                <strong className="text-foreground">What broke:</strong> The {incident.service} function in {incident.region} experienced
-                elevated error rates due to timeout issues connecting to downstream services.
-              </p>
-              <p>
-                <strong className="text-foreground">User impact:</strong> Approximately 15% of API requests failed during peak traffic,
-                affecting real-time data processing pipelines.
-              </p>
-              <p>
-                <strong className="text-foreground">What to monitor:</strong> Watch CloudWatch metrics for Lambda duration and
-                concurrent executions. Alert if p99 latency exceeds 5 seconds.
-              </p>
-            </div>
+            
+            {analysisLoading ? (
+              <AnalysisSkeleton />
+            ) : analysisError ? (
+              <p className="text-sm text-red-400/80 italic">{analysisError}</p>
+            ) : analysis ? (
+              <div className="space-y-3 text-sm text-muted-foreground animate-fade-in">
+                <p>
+                  <strong className="text-foreground">What broke:</strong> {analysis.whatBroke}
+                </p>
+                <p>
+                  <strong className="text-foreground">User impact:</strong> {analysis.userImpact}
+                </p>
+                <p>
+                  <strong className="text-foreground">What to monitor:</strong> {analysis.whatToMonitor}
+                </p>
+                {analysis.revenueLossEstimate && analysis.revenueLossEstimate !== "Minimal" && (
+                  <p className="pt-2 border-t border-white/5">
+                    <strong className="text-red-400">Estimated Revenue Impact:</strong> {analysis.revenueLossEstimate}
+                  </p>
+                )}
+              </div>
+            ) : null}
           </div>
 
           {/* Impact Analysis */}
-          <div className="glass-card p-4">
-            <h3 className="text-sm font-semibold text-muted-foreground mb-3">Impact Analysis</h3>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-400">23.4%</div>
-                <div className="text-xs text-muted-foreground">Error Rate</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-orange-400">4.2s</div>
-                <div className="text-xs text-muted-foreground">Avg Latency</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-400">1.2K</div>
-                <div className="text-xs text-muted-foreground">Affected Requests</div>
+          {showImpactAnalysis && (
+            <div className="glass-card p-4">
+              <h3 className="text-sm font-semibold text-muted-foreground mb-3">Impact Analysis</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-red-400">{errorRate}</div>
+                  <div className="text-xs text-muted-foreground">Error Rate</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-400">{avgLatency}</div>
+                  <div className="text-xs text-muted-foreground">Avg Latency</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-yellow-400">{affectedRequests}</div>
+                  <div className="text-xs text-muted-foreground">Affected Requests</div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Remediation Button */}
           {!showRemediation && (
             <button
-              onClick={() => setShowRemediation(true)}
-              className="w-full glass-card py-3 text-cloud-light font-semibold hover:bg-primary/20 transition-all flex items-center justify-center gap-2"
+              onClick={generateRemediation}
+              disabled={remediationLoading}
+              data-testid="remediation-toggle"
+              className="w-full glass-card py-3 text-cloud-light font-semibold hover:bg-primary/20 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              <Zap className="w-4 h-4" />
+              {remediationLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
               Generate Remediation Plan
             </button>
           )}
 
           {/* Remediation Panel */}
           {showRemediation && (
-            <div className="glass-card p-4 space-y-4">
+            <div className="glass-card p-4 space-y-4 animate-fade-in">
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-green-400" />
                 <h3 className="text-sm font-semibold text-green-400">AI Remediation Plan</h3>
+                {remediationLoading && <Loader2 className="w-3 h-3 animate-spin text-green-400" />}
               </div>
 
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground mb-2">IMMEDIATE ACTIONS</h4>
-                <div className="space-y-2">
-                  {remediationActions.immediate.map((action, index) => (
-                    <div key={index} className="bg-cloud-navy/50 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-1">
-                        <code className="text-xs text-cloud-light flex-1 overflow-x-auto">{action.cmd}</code>
-                        <button
-                          onClick={() => copyCommand(action.cmd, index)}
-                          className="ml-2 p-1 hover:bg-white/10 rounded shrink-0"
-                        >
-                          {copiedIndex === index ? (
-                            <Check className="w-4 h-4 text-green-400" />
-                          ) : (
-                            <Copy className="w-4 h-4 text-muted-foreground" />
-                          )}
-                        </button>
-                      </div>
-                      <span className="text-xs text-muted-foreground">Est. time: {action.time}</span>
+              {remediationLoading ? (
+                <div className="space-y-4">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="bg-cloud-navy/50 rounded-lg p-3 animate-pulse">
+                      <div className="h-4 bg-muted/30 rounded w-3/4 mb-2" />
+                      <div className="h-3 bg-muted/20 rounded w-1/4" />
                     </div>
                   ))}
                 </div>
-              </div>
+              ) : remediationError ? (
+                <p className="text-sm text-red-400/80 italic">{remediationError}</p>
+              ) : remediation ? (
+                <>
+                  <div>
+                    <h4 className="text-xs font-semibold text-muted-foreground mb-2">IMMEDIATE ACTIONS</h4>
+                    <div className="space-y-2">
+                      {remediation.immediateActions.map((action, index) => (
+                        <div key={index} className="bg-cloud-navy/50 rounded-lg p-3 group">
+                          <div className="flex items-center justify-between mb-1">
+                            <code className="text-xs text-cloud-light flex-1 overflow-x-auto scrollbar-hide">{action.cmd}</code>
+                            <button
+                              onClick={() => copyCommand(action.cmd, index)}
+                              data-testid={`copy-command-${index}`}
+                              className="ml-2 p-1 hover:bg-white/10 rounded shrink-0 transition-colors"
+                            >
+                              {copiedIndex === index ? (
+                                <Check className="w-4 h-4 text-green-400" />
+                              ) : (
+                                <Copy className="w-4 h-4 text-muted-foreground group-hover:text-cloud-light" />
+                              )}
+                            </button>
+                          </div>
+                          <span className="text-xs text-muted-foreground">Est. time: {action.time}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground mb-2">SHORT-TERM ACTIONS</h4>
-                <ul className="space-y-2">
-                  {remediationActions.shortTerm.map((action, index) => (
-                    <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                      <span className="text-cloud-sky">•</span>
-                      {action}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                  <div>
+                    <h4 className="text-xs font-semibold text-muted-foreground mb-2">SHORT-TERM ACTIONS</h4>
+                    <ul className="space-y-2">
+                      {remediation.shortTerm.map((action, index) => (
+                        <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                          <span className="text-cloud-sky">•</span>
+                          {action}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-              <div>
-                <h4 className="text-xs font-semibold text-muted-foreground mb-2">LONG-TERM ACTIONS</h4>
-                <ul className="space-y-2">
-                  {remediationActions.longTerm.map((action, index) => (
-                    <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                      <span className="text-cloud-sky">•</span>
-                      {action}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                  <div>
+                    <h4 className="text-xs font-semibold text-muted-foreground mb-2">LONG-TERM ACTIONS</h4>
+                    <ul className="space-y-2">
+                      {remediation.longTerm.map((action, index) => (
+                        <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                          <span className="text-cloud-sky">•</span>
+                          {action}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              ) : null}
             </div>
           )}
 
-          {/* Bottom padding so last item isn't flush against edge */}
           <div className="h-2" />
         </div>
       </DialogContent>

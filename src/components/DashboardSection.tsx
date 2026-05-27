@@ -57,6 +57,7 @@ const DashboardSection = () => {
   const [selectedIncident, setSelectedIncident] = useState<Incident | null>(null);
   const [connectModalOpen, setConnectModalOpen] = useState(false);
   const [notifiedIds, setNotifiedIds] = useState<Set<string>>(new Set());
+  const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
 
   const { incidents, loading, error } = useIncidents(200);
 
@@ -164,6 +165,8 @@ const DashboardSection = () => {
             {sortedProviders.map(([providerKey, providerIncidents]) => {
               const config = getProviderConfig(providerKey);
               const ProviderIcon = config.icon;
+              const visibleCount = visibleCounts[providerKey] ?? 10;
+              const remainingCount = providerIncidents.length - visibleCount;
 
               return (
                 <div key={providerKey} className="space-y-4">
@@ -177,17 +180,26 @@ const DashboardSection = () => {
                     </span>
                   </div>
                   <div className="space-y-3">
-                    {providerIncidents.slice(0, 5).map((incident) => (
+                    {providerIncidents.slice(0, visibleCount).map((incident) => (
                       <IncidentCard
                         key={incident.id}
                         incident={incident}
                         onClick={() => setSelectedIncident(incident)}
                       />
                     ))}
-                    {providerIncidents.length > 5 && (
-                      <p className="text-xs text-muted-foreground text-center py-2">
-                        +{providerIncidents.length - 5} more incidents
-                      </p>
+                    {remainingCount > 0 && (
+                      <button
+                        onClick={() =>
+                          setVisibleCounts((prev) => ({
+                            ...prev,
+                            [providerKey]: (prev[providerKey] ?? 10) + 10,
+                          }))
+                        }
+                        data-testid={`show-more-incidents-${providerKey}`}
+                        className="w-full text-xs text-muted-foreground border border-white/[0.08] rounded-lg py-2 transition-colors hover:text-foreground hover:border-white/[0.2]"
+                      >
+                        Show more incidents (+{remainingCount} remaining)
+                      </button>
                     )}
                   </div>
                 </div>

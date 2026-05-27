@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,7 @@ const popularDomains = [
 const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
   const [domain, setDomain] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { toast } = useToast();
 
   const filteredSuggestions = domain.length > 0
@@ -37,7 +38,10 @@ const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
       toast({
         title: 'SSO Configuration Required',
         description: `SSO for ${domain} needs to be configured by your administrator.`,
@@ -46,9 +50,24 @@ const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
     }, 1500);
   };
 
+  useEffect(() => {
+    if (!open && timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+      setIsLoading(false);
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md bg-card border-border shadow-elevated">
+      <DialogContent className="sm:max-w-md bg-card border-border shadow-elevated" data-testid="sso-modal">
         <DialogHeader className="space-y-3">
           <div className="mx-auto w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center">
             <Building2 className="w-6 h-6 text-primary" />
@@ -65,6 +84,7 @@ const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
               placeholder="company.com"
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
+              data-testid="sso-domain-input"
               className="h-12 pl-4 pr-4 text-base bg-secondary/50 border-border focus:border-primary text-foreground"
             />
 
@@ -74,6 +94,7 @@ const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
                   <button
                     key={suggestion}
                     onClick={() => setDomain(suggestion)}
+                    data-testid={`sso-suggestion-${suggestion}`}
                     className="w-full px-4 py-2.5 text-left hover:bg-secondary/50 transition-colors text-sm text-foreground"
                   >
                     {suggestion}
@@ -86,6 +107,7 @@ const SSOModal = ({ open, onOpenChange }: SSOModalProps) => {
           <Button
             onClick={handleSSOLogin}
             disabled={isLoading}
+            data-testid="sso-submit"
             className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
           >
             {isLoading ? (

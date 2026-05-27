@@ -10,6 +10,7 @@ export interface Incident {
   title: string;
   timestamp: Date;
   provider: "aws" | "azure" | "openai";
+  raw_json?: any;
 }
 
 interface IncidentCardProps {
@@ -37,6 +38,7 @@ const IncidentCard = ({ incident, onClick }: IncidentCardProps) => {
   return (
     <div
       onClick={onClick}
+      data-testid={`incident-card-${incident.id}`}
       className="glass-card p-5 cursor-pointer hover:bg-white/[0.03] hover:border-white/[0.12] transition-all duration-300 group"
     >
       {/* Header */}

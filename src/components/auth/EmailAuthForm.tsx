@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Mail, Eye, EyeOff, ArrowLeft, CheckCircle, Clock } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface EmailAuthFormProps {
   mode: 'signin' | 'signup';
@@ -19,6 +20,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
   const [showPassword, setShowPassword] = useState(false);
   const [signupComplete, setSignupComplete] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState('');
+  const { toast } = useToast();
 
   const resetFields = () => {
     setEmail('');
@@ -34,6 +36,14 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      toast({
+        title: 'Missing fields',
+        description: 'Please enter both email and password.',
+        variant: 'destructive',
+      });
+      return;
+    }
     const result = await onSubmit(email, password, mode === 'signup' ? fullName : undefined);
     if (mode === 'signup' && result?.success) {
       setSubmittedEmail(email);
@@ -44,7 +54,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
   // ── Post-signup confirmation screen ──────────────────────────────────────
   if (signupComplete) {
     return (
-      <div className="space-y-6 animate-fade-in text-center">
+      <div className="space-y-6 animate-fade-in text-center" data-testid="auth-confirmation-screen">
         <div className="flex justify-center">
           <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
             <Mail className="w-10 h-10 text-primary" />
@@ -54,7 +64,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
         <div className="space-y-2">
           <h3 className="text-xl font-semibold text-foreground">Check your email</h3>
           <p className="text-sm text-muted-foreground">We sent a confirmation link to</p>
-          <p className="text-sm font-semibold text-primary break-all">{submittedEmail}</p>
+          <p className="text-sm font-semibold text-primary break-all" data-testid="auth-confirmation-email">{submittedEmail}</p>
         </div>
 
         <div className="bg-secondary/30 rounded-xl p-4 text-left space-y-3 border border-border">
@@ -85,6 +95,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
             resetFields();
             onModeChange('signin');
           }}
+          data-testid="auth-back-to-signin"
           className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mx-auto"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -96,9 +107,10 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
 
   // ── Normal auth form ──────────────────────────────────────────────────────
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-4 animate-fade-in" data-testid="email-auth-form">
       <button
         onClick={onBack}
+        data-testid="auth-back-options"
         className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -108,6 +120,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
       <div className="flex gap-2 p-1 bg-secondary/50 rounded-xl">
         <button
           onClick={() => handleModeChange('signin')}
+          data-testid="auth-tab-signin"
           className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
             mode === 'signin'
               ? 'bg-card text-foreground shadow-sm border border-border'
@@ -118,6 +131,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
         </button>
         <button
           onClick={() => handleModeChange('signup')}
+          data-testid="auth-tab-signup"
           className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
             mode === 'signup'
               ? 'bg-card text-foreground shadow-sm border border-border'
@@ -140,6 +154,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
               placeholder="John Doe"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
+              data-testid="auth-fullname-input"
               className="h-12 bg-secondary/50 border-border focus:border-primary text-foreground placeholder:text-muted-foreground"
             />
           </div>
@@ -155,6 +170,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            data-testid="auth-email-input"
             className="h-12 bg-secondary/50 border-border focus:border-primary text-foreground placeholder:text-muted-foreground"
           />
         </div>
@@ -180,11 +196,13 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              data-testid="auth-password-input"
               className="h-12 bg-secondary/50 border-border focus:border-primary pr-12 text-foreground placeholder:text-muted-foreground"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
+              data-testid="auth-password-toggle"
               className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -195,6 +213,7 @@ const EmailAuthForm = ({ mode, onModeChange, onSubmit, onBack, isLoading }: Emai
         <Button
           type="submit"
           disabled={isLoading}
+          data-testid="auth-submit"
           className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
         >
           {isLoading ? (

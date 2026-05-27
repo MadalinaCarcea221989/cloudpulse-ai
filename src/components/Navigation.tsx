@@ -84,7 +84,11 @@ const Navigation = () => {
         ) : user ? (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="glass-pill px-2.5 py-1.5 h-auto gap-2">
+              <Button
+                variant="ghost"
+                className="glass-pill px-2.5 py-1.5 h-auto gap-2"
+                data-testid="nav-user-menu"
+              >
                 <Avatar className="w-6 h-6">
                   <AvatarImage src={user.user_metadata?.avatar_url} />
                   <AvatarFallback className="bg-primary/20 text-cloud-light text-[10px]">
@@ -100,7 +104,11 @@ const Navigation = () => {
               <DropdownMenuItem className="text-muted-foreground text-xs">
                 {user.email}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleSignOut} className="text-red-400 cursor-pointer">
+              <DropdownMenuItem
+                onClick={handleSignOut}
+                className="text-red-400 cursor-pointer"
+                data-testid="nav-signout"
+              >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
               </DropdownMenuItem>
@@ -108,7 +116,10 @@ const Navigation = () => {
           </DropdownMenu>
         ) : (
           <Link href="/auth">
-            <Button className="glass-pill px-4 py-1.5 h-auto text-xs font-medium text-cloud-light hover:bg-primary/20 transition-all">
+            <Button
+              className="glass-pill px-4 py-1.5 h-auto text-xs font-medium text-cloud-light hover:bg-primary/20 transition-all"
+              data-testid="nav-signin"
+            >
               <LogIn className="w-3.5 h-3.5 mr-1.5" />
               Sign In
             </Button>

@@ -70,34 +70,33 @@ function mapProvider(raw: string | null): Incident["provider"] {
 // Row → Incident transformer
 // ---------------------------------------------------------------------------
 
-// Mirrors the Supabase incidents table shape from types.ts
+// Mirrors the Supabase statuspage_incidents table shape from TimescaleDB pipeline
 interface SupabaseIncidentRow {
-  id: string;
+  incident_id: string; // The primary ID in the production table
+  id?: string;         // Fallback for older rows
   provider: string | null;
-  provider_incident_id: string | null;
   service: string | null;
   region: string | null;
   severity: string | null;
-  description: string | null;
   title: string | null;
   status: string | null;
   started_at: string | null;
-  resolved_at: string | null;
-  cloud_account_id: string | null;
-  raw_json: Record<string, unknown> | null;
   created_at: string;
+  updated_at?: string;
+  raw_json: Record<string, unknown> | null;
 }
 
 function toIncident(row: SupabaseIncidentRow): Incident {
   return {
-    id: row.id,
+    id: row.incident_id ?? row.id ?? Math.random().toString(36).substr(2, 9),
     service: row.service ?? "Unknown Service",
     region: row.region ?? "Unknown Region",
     severity: mapSeverity(row.severity),
     status: mapStatus(row.status),
-    title: row.title ?? row.description ?? "No description available",
+    title: row.title ?? "No description available",
     timestamp: new Date(row.started_at ?? row.created_at),
-    provider: (row.provider ?? "unknown").toLowerCase(),
+    provider: (row.provider ?? "unknown").toLowerCase() as Incident["provider"],
+    raw_json: row.raw_json,
   };
 }
 
@@ -121,41 +120,53 @@ export function useIncidents(limit = 50): UseIncidentsResult {
     async function fetchIncidents() {
       setLoading(true);
       setError(null);
+      try {
+        const { data, error: fetchError } = await supabase
+          .from("statuspage_incidents")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(limit);
 
-      const { data, error: fetchError } = await supabase
-        .from("incidents")
-        .select("*")
-        .order("started_at", { ascending: false })
-        .limit(limit);
+        if (fetchError) {
+          // Fallback to 'incidents' if 'statuspage_incidents' is not yet fully migrated in this env
+          const { data: fallbackData, error: fallbackError } = await supabase
+            .from("incidents")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(limit);
 
-      if (fetchError) {
-        setError(fetchError.message);
+          if (fallbackError) {
+            setError(fetchError.message);
+            return;
+          }
+          setIncidents((fallbackData ?? []).map(toIncident));
+        } else {
+          setIncidents((data ?? []).map(toIncident));
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "Failed to load incidents.";
+        setError(message);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      setIncidents((data ?? []).map(toIncident));
-      setLoading(false);
     }
 
     fetchIncidents();
 
     // --- Realtime subscription ---
-    // Fires on INSERT (new incident) and UPDATE (status change, resolution).
     const channel = supabase
       .channel("incidents-feed")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "incidents" },
+        { event: "INSERT", schema: "public", table: "statuspage_incidents" },
         (payload) => {
           const newIncident = toIncident(payload.new as SupabaseIncidentRow);
-          // Prepend new incident and keep list bounded.
           setIncidents((prev) => [newIncident, ...prev].slice(0, limit));
         }
       )
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "incidents" },
+        { event: "UPDATE", schema: "public", table: "statuspage_incidents" },
         (payload) => {
           const updated = toIncident(payload.new as SupabaseIncidentRow);
           setIncidents((prev) =>

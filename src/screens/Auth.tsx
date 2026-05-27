@@ -37,26 +37,46 @@ const Auth = () => {
 
   const handleGoogleSignIn = async () => {
     setIsSigningIn(true);
-    const { error } = await signInWithGoogle();
-    if (error) {
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) {
+        toast({
+          title: 'Sign in failed',
+          description: error.message,
+          variant: 'destructive',
+        });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unable to sign in with Google.';
       toast({
         title: 'Sign in failed',
-        description: error.message,
+        description: message,
         variant: 'destructive',
       });
+    } finally {
       setIsSigningIn(false);
     }
   };
 
   const handleMicrosoftSignIn = async () => {
     setIsSigningIn(true);
-    const { error } = await signInWithMicrosoft();
-    if (error) {
+    try {
+      const { error } = await signInWithMicrosoft();
+      if (error) {
+        toast({
+          title: 'Sign in failed',
+          description: error.message,
+          variant: 'destructive',
+        });
+      }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Unable to sign in with Microsoft.';
       toast({
         title: 'Sign in failed',
-        description: error.message,
+        description: message,
         variant: 'destructive',
       });
+    } finally {
       setIsSigningIn(false);
     }
   };
@@ -133,22 +153,47 @@ const Auth = () => {
 
   useEffect(() => {
     const updateAccountType = async () => {
-      if (user) {
-        await supabase
+      if (!user) return;
+      try {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('account_type')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profileError) {
+          throw profileError;
+        }
+
+        if (profile?.account_type === accountType) {
+          return;
+        }
+
+        const { error: updateError } = await supabase
           .from('profiles')
           .update({ account_type: accountType })
           .eq('user_id', user.id);
+
+        if (updateError) {
+          throw updateError;
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unable to update account type.';
+        toast({
+          title: 'Update failed',
+          description: message,
+          variant: 'destructive',
+        });
       }
     };
-    if (user) updateAccountType();
-  }, [user, accountType]);
+    updateAccountType();
+  }, [user, accountType, toast]);
 
   const handleOnboardingComplete = async (data: {
     role: string;
     infoTypes: string[];
     preferences: object;
   }) => {
-    console.log('Onboarding completed:', data);
     toast({
       title: 'Setup complete!',
       description: 'Your preferences have been saved.',

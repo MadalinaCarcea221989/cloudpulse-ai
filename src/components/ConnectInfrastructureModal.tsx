@@ -89,16 +89,22 @@ const ConnectInfrastructureModal = ({ open, onClose }: Props) => {
       if (formValues[f.key]) metadata[f.key] = formValues[f.key];
     });
 
-    await addConnection({
-      provider: config.provider,
-      display_name: displayName.trim(),
-      account_identifier: identifierField ? formValues[identifierField.key] : undefined,
-      region: formValues.region,
-      metadata,
-    });
+    try {
+      const result = await addConnection({
+        provider: config.provider,
+        display_name: displayName.trim(),
+        account_identifier: identifierField ? formValues[identifierField.key] : undefined,
+        region: formValues.region,
+        metadata,
+      });
 
-    setFormValues({});
-    setSubmitting(false);
+      if (result) {
+        setFormValues({});
+        onClose();
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const providerConnections = (provider: CloudProvider) =>
@@ -106,7 +112,10 @@ const ConnectInfrastructureModal = ({ open, onClose }: Props) => {
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="glass-card border-cloud-blue/30 sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent
+        className="glass-card border-cloud-blue/30 sm:max-w-[600px] max-h-[80vh] overflow-y-auto"
+        data-testid="connect-modal"
+      >
         <DialogHeader>
           <DialogTitle className="text-cloud-light text-xl flex items-center gap-2">
             <CloudIcon className="w-5 h-5" />
@@ -120,7 +129,12 @@ const ConnectInfrastructureModal = ({ open, onClose }: Props) => {
               const Icon = p.icon;
               const count = providerConnections(p.provider).length;
               return (
-                <TabsTrigger key={p.provider} value={p.provider} className="flex items-center gap-1.5 text-xs">
+                <TabsTrigger
+                  key={p.provider}
+                  value={p.provider}
+                  className="flex items-center gap-1.5 text-xs"
+                  data-testid={`connect-tab-${p.provider}`}
+                >
                   <Icon className={`w-4 h-4 ${p.color}`} />
                   {p.label}
                   {count > 0 && (
@@ -157,6 +171,7 @@ const ConnectInfrastructureModal = ({ open, onClose }: Props) => {
                       placeholder={field.placeholder}
                       value={formValues[field.key] || ""}
                       onChange={(e) => handleChange(field.key, e.target.value)}
+                      data-testid={`connect-input-${config.provider}-${field.key}`}
                       className="bg-secondary/50 border-cloud-blue/20 text-foreground h-9 text-sm"
                     />
                   </div>
@@ -164,6 +179,7 @@ const ConnectInfrastructureModal = ({ open, onClose }: Props) => {
                 <Button
                   onClick={() => handleSubmit(config)}
                   disabled={submitting || !formValues.display_name?.trim()}
+                  data-testid={`connect-submit-${config.provider}`}
                   className="w-full mt-2"
                 >
                   {submitting ? (

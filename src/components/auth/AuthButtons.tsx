@@ -43,6 +43,7 @@ const AuthButtons = ({
         onClick={onSSOClick}
         disabled={isLoading}
         variant="outline"
+        data-testid="auth-sso-button"
         className="w-full h-14 bg-secondary/50 hover:bg-secondary border border-border hover:border-primary/50 text-foreground font-medium transition-all duration-200 group"
       >
         <Shield className="w-5 h-5 mr-3 text-primary group-hover:scale-110 transition-transform" />
@@ -57,6 +58,7 @@ const AuthButtons = ({
         onClick={onGoogleSignIn}
         disabled={isLoading}
         variant="outline"
+        data-testid="auth-google-button"
         className="w-full h-12 bg-secondary/50 hover:bg-secondary border border-border hover:border-primary/50 text-foreground font-medium transition-all duration-200"
       >
         <GoogleIcon />
@@ -68,6 +70,7 @@ const AuthButtons = ({
         onClick={onMicrosoftSignIn}
         disabled={isLoading}
         variant="outline"
+        data-testid="auth-microsoft-button"
         className="w-full h-12 bg-secondary/50 hover:bg-secondary border border-border hover:border-primary/50 text-foreground font-medium transition-all duration-200"
       >
         <MicrosoftIcon />
@@ -80,6 +83,7 @@ const AuthButtons = ({
           onClick={onEmailClick}
           disabled={isLoading}
           variant="outline"
+          data-testid="auth-email-button"
           className="w-full h-12 bg-secondary/50 hover:bg-secondary border border-border hover:border-primary/50 text-foreground font-medium transition-all duration-200"
         >
           <Mail className="w-5 h-5 mr-3 text-muted-foreground" />
