@@ -70,10 +70,10 @@ function mapProvider(raw: string | null): Incident["provider"] {
 // Row → Incident transformer
 // ---------------------------------------------------------------------------
 
-// Mirrors the Supabase statuspage_incidents table shape from TimescaleDB pipeline
+// Mirrors the Supabase incidents table shape from TimescaleDB pipeline
 interface SupabaseIncidentRow {
-  incident_id: string; // The primary ID in the production table
-  id?: string;         // Fallback for older rows
+  incident_id?: string; // Optional if using standard id
+  id: string;
   provider: string | null;
   service: string | null;
   region: string | null;
@@ -88,7 +88,7 @@ interface SupabaseIncidentRow {
 
 function toIncident(row: SupabaseIncidentRow): Incident {
   return {
-    id: row.incident_id ?? row.id ?? Math.random().toString(36).substr(2, 9),
+    id: row.incident_id ?? row.id,
     service: row.service ?? "Unknown Service",
     region: row.region ?? "Unknown Region",
     severity: mapSeverity(row.severity),
@@ -122,27 +122,17 @@ export function useIncidents(limit = 50): UseIncidentsResult {
       setError(null);
       try {
         const { data, error: fetchError } = await supabase
-          .from("statuspage_incidents")
+          .from("incidents")
           .select("*")
           .order("created_at", { ascending: false })
           .limit(limit);
 
         if (fetchError) {
-          // Fallback to 'incidents' if 'statuspage_incidents' is not yet fully migrated in this env
-          const { data: fallbackData, error: fallbackError } = await supabase
-            .from("incidents")
-            .select("*")
-            .order("created_at", { ascending: false })
-            .limit(limit);
-
-          if (fallbackError) {
-            setError(fetchError.message);
-            return;
-          }
-          setIncidents((fallbackData ?? []).map(toIncident));
-        } else {
-          setIncidents((data ?? []).map(toIncident));
+          setError(fetchError.message);
+          return;
         }
+        
+        setIncidents((data ?? []).map(toIncident));
       } catch (err) {
         const message = err instanceof Error ? err.message : "Failed to load incidents.";
         setError(message);
@@ -158,7 +148,7 @@ export function useIncidents(limit = 50): UseIncidentsResult {
       .channel("incidents-feed")
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "statuspage_incidents" },
+        { event: "INSERT", schema: "public", table: "incidents" },
         (payload) => {
           const newIncident = toIncident(payload.new as SupabaseIncidentRow);
           setIncidents((prev) => [newIncident, ...prev].slice(0, limit));
@@ -166,7 +156,7 @@ export function useIncidents(limit = 50): UseIncidentsResult {
       )
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "statuspage_incidents" },
+        { event: "UPDATE", schema: "public", table: "incidents" },
         (payload) => {
           const updated = toIncident(payload.new as SupabaseIncidentRow);
           setIncidents((prev) =>
@@ -184,4 +174,3 @@ export function useIncidents(limit = 50): UseIncidentsResult {
 
   return { incidents, loading, error };
 }
-
