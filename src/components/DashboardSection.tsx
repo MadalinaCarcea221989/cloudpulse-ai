@@ -17,6 +17,7 @@ import IncidentDetailModal from "./IncidentDetailModal";
 import ConnectInfrastructureModal from "./ConnectInfrastructureModal";
 import { toast } from "sonner";
 import { useIncidents } from "@/hooks/useIncidents";
+import { useWeeklyReport } from "@/hooks/useWeeklyReport";
 
 const PROVIDER_CONFIG: Record<
   string,
@@ -60,6 +61,7 @@ const DashboardSection = () => {
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
 
   const { incidents, loading, error } = useIncidents(200);
+  const { report: weeklyReport, loading: weeklyLoading } = useWeeklyReport();
 
   useEffect(() => {
     const newCritical = incidents.find(
@@ -139,6 +141,23 @@ const DashboardSection = () => {
               </p>
             </div>
           </div>
+
+          {(weeklyLoading || weeklyReport?.summary) && (
+            <div className="mt-6 pt-6 border-t border-white/[0.06]">
+              <h3 className="eyebrow mb-2">7-day intelligence report</h3>
+              {weeklyLoading ? (
+                <div className="space-y-2">
+                  <div className="h-3 w-full bg-muted/40 rounded animate-pulse" />
+                  <div className="h-3 w-5/6 bg-muted/40 rounded animate-pulse" />
+                  <div className="h-3 w-4/6 bg-muted/40 rounded animate-pulse" />
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {weeklyReport!.summary}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {loading && (

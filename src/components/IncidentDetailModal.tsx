@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Incident } from "./IncidentCard";
-import { AlertTriangle, Activity, Clock, CheckCircle, Zap, Copy, Check, Loader2, Brain } from "lucide-react";
+import { AlertTriangle, Activity, Clock, CheckCircle, Zap, Copy, Check, Loader2, Brain, Layers } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +12,15 @@ interface IncidentDetailModalProps {
 }
 
 const ML_CLASSIFIER_URL = "https://cloudpulse-ml-classifier.hf.space";
+
+interface SimilarIncident {
+  incident_id: string;
+  provider: string;
+  service?: string | null;
+  severity: string;
+  description: string;
+  similarity: number;
+}
 
 interface ClassificationExplanation {
   predicted_class?: string;
@@ -58,6 +67,10 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
   const [classification, setClassification] = useState<ClassificationData | null>(null);
   const [classificationLoading, setClassificationLoading] = useState(false);
 
+  // Similar incidents states
+  const [similarIncidents, setSimilarIncidents] = useState<SimilarIncident[]>([]);
+  const [similarLoading, setSimilarLoading] = useState(false);
+
   // Remediation states
   const [remediation, setRemediation] = useState<RemediationData | null>(null);
   const [remediationLoading, setRemediationLoading] = useState(false);
@@ -95,6 +108,27 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
       console.error("ML classify error:", err);
     } finally {
       setClassificationLoading(false);
+    }
+  }, []);
+
+  const fetchSimilar = useCallback(async (inc: Incident) => {
+    const description =
+      ((inc.raw_json as Record<string, unknown>)?.description as string) ?? inc.title;
+    if (!description) return;
+    setSimilarLoading(true);
+    try {
+      const res = await fetch(`${ML_CLASSIFIER_URL}/similar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description, top_k: 3 }),
+      });
+      if (!res.ok) throw new Error(`/similar returned ${res.status}`);
+      const data: { results: SimilarIncident[] } = await res.json();
+      setSimilarIncidents(data.results ?? []);
+    } catch (err) {
+      console.error("Similar incidents error:", err);
+    } finally {
+      setSimilarLoading(false);
     }
   }, []);
 
@@ -140,12 +174,14 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
     if (open && incident) {
       fetchAnalysis(incident);
       fetchClassification(incident);
+      fetchSimilar(incident);
       setRemediation(null);
       setShowRemediation(false);
       setRemediationError(null);
       setClassification(null);
+      setSimilarIncidents([]);
     }
-  }, [open, incident, fetchAnalysis, fetchClassification]);
+  }, [open, incident, fetchAnalysis, fetchClassification, fetchSimilar]);
 
   useEffect(() => {
     return () => {
@@ -440,6 +476,36 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
                   </div>
                 </>
               ) : null}
+            </div>
+          )}
+
+          {/* Similar Incidents */}
+          {(similarLoading || similarIncidents.length > 0) && (
+            <div className="glass-card p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Layers className="w-4 h-4 text-purple-400" />
+                <h3 className="text-sm font-semibold text-purple-400">Similar Incidents</h3>
+                {similarLoading && <Loader2 className="w-3 h-3 animate-spin text-purple-400" />}
+              </div>
+              {similarLoading ? (
+                <AnalysisSkeleton />
+              ) : (
+                <div className="space-y-2">
+                  {similarIncidents.map((sim) => (
+                    <div key={sim.incident_id} className="bg-cloud-navy/50 rounded-lg p-3">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-medium text-foreground">
+                          {sim.service ?? sim.provider}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {Math.round(sim.similarity * 100)}% match
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{sim.description}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
