@@ -9,8 +9,11 @@ export interface Incident {
   status: "detected" | "investigating" | "monitoring" | "resolved";
   title: string;
   timestamp: Date;
-  provider: "aws" | "azure" | "openai";
+  provider: string;
   raw_json?: any;
+  mlCategory?: string;
+  mlExplanation?: string;
+  mlConfidence?: number;
 }
 
 interface IncidentCardProps {

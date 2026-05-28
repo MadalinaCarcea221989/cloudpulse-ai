@@ -95,7 +95,7 @@ function toIncident(row: SupabaseIncidentRow): Incident {
     status: mapStatus(row.status),
     title: row.title ?? "No description available",
     timestamp: new Date(row.started_at ?? row.created_at),
-    provider: (row.provider ?? "unknown").toLowerCase() as Incident["provider"],
+    provider: (row.provider ?? "unknown").toLowerCase(),
     raw_json: row.raw_json,
   };
 }

@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Incident } from "./IncidentCard";
-import { AlertTriangle, Activity, Clock, CheckCircle, Zap, Copy, Check, Loader2 } from "lucide-react";
+import { AlertTriangle, Activity, Clock, CheckCircle, Zap, Copy, Check, Loader2, Brain } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,6 +9,17 @@ interface IncidentDetailModalProps {
   incident: Incident | null;
   open: boolean;
   onClose: () => void;
+}
+
+const ML_CLASSIFIER_URL = "https://cloudpulse-ml-classifier.hf.space";
+
+interface ClassificationData {
+  category?: string;
+  incident_type?: string;
+  label?: string;
+  explanation?: string;
+  confidence?: number;
+  score?: number;
 }
 
 interface AnalysisData {
@@ -37,10 +48,38 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
   const [analysisLoading, setAnalysisLoading] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
+  // ML Classification states
+  const [classification, setClassification] = useState<ClassificationData | null>(null);
+  const [classificationLoading, setClassificationLoading] = useState(false);
+
   // Remediation states
   const [remediation, setRemediation] = useState<RemediationData | null>(null);
   const [remediationLoading, setRemediationLoading] = useState(false);
   const [remediationError, setRemediationError] = useState<string | null>(null);
+
+  const fetchClassification = useCallback(async (inc: Incident) => {
+    setClassificationLoading(true);
+    try {
+      const res = await fetch(`${ML_CLASSIFIER_URL}/classify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: inc.title,
+          service: inc.service,
+          provider: inc.provider,
+          severity: inc.severity,
+          description: (inc.raw_json as Record<string, unknown>)?.description ?? inc.title,
+        }),
+      });
+      if (!res.ok) throw new Error(`classify returned ${res.status}`);
+      const data: ClassificationData = await res.json();
+      setClassification(data);
+    } catch (err) {
+      console.error("ML classify error:", err);
+    } finally {
+      setClassificationLoading(false);
+    }
+  }, []);
 
   const fetchAnalysis = useCallback(async (inc: Incident) => {
     setAnalysisLoading(true);
@@ -83,12 +122,13 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
   useEffect(() => {
     if (open && incident) {
       fetchAnalysis(incident);
-      // Reset remediation state when switching incidents
+      fetchClassification(incident);
       setRemediation(null);
       setShowRemediation(false);
       setRemediationError(null);
+      setClassification(null);
     }
-  }, [open, incident, fetchAnalysis]);
+  }, [open, incident, fetchAnalysis, fetchClassification]);
 
   useEffect(() => {
     return () => {
@@ -226,6 +266,39 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
               </div>
             ) : null}
           </div>
+
+          {/* ML Classification */}
+          {(classificationLoading || classification) && (
+            <div className="glass-card p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Brain className="w-4 h-4 text-cloud-sky" />
+                <h3 className="text-sm font-semibold text-cloud-sky">ML Classification</h3>
+                {classificationLoading && <Loader2 className="w-3 h-3 animate-spin text-cloud-sky" />}
+              </div>
+              {classificationLoading ? (
+                <AnalysisSkeleton />
+              ) : classification ? (
+                <div className="space-y-2 text-sm animate-fade-in">
+                  {(classification.category ?? classification.incident_type ?? classification.label) && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">Category:</span>
+                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-cloud-sky/10 text-cloud-sky border border-cloud-sky/20">
+                        {classification.category ?? classification.incident_type ?? classification.label}
+                      </span>
+                      {(classification.confidence ?? classification.score) != null && (
+                        <span className="text-xs text-muted-foreground ml-auto">
+                          {Math.round(((classification.confidence ?? classification.score)!) * 100)}% confidence
+                        </span>
+                      )}
+                    </div>
+                  )}
+                  {classification.explanation && (
+                    <p className="text-muted-foreground leading-relaxed">{classification.explanation}</p>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          )}
 
           {/* Impact Analysis */}
           {showImpactAnalysis && (
