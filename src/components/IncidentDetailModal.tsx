@@ -13,11 +13,17 @@ interface IncidentDetailModalProps {
 
 const ML_CLASSIFIER_URL = "https://cloudpulse-ml-classifier.hf.space";
 
+interface ClassificationExplanation {
+  predicted_class?: string;
+  top_contributions?: unknown;
+  expected_value_for_class?: unknown;
+}
+
 interface ClassificationData {
   category?: string;
   incident_type?: string;
   label?: string;
-  explanation?: string;
+  explanation?: string | ClassificationExplanation | null;
   confidence?: number;
   score?: number;
 }
@@ -279,37 +285,54 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
           </div>
 
           {/* ML Classification */}
-          {(classificationLoading || classification) && (
-            <div className="glass-card p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Brain className="w-4 h-4 text-cloud-sky" />
-                <h3 className="text-sm font-semibold text-cloud-sky">ML Classification</h3>
-                {classificationLoading && <Loader2 className="w-3 h-3 animate-spin text-cloud-sky" />}
-              </div>
-              {classificationLoading ? (
-                <AnalysisSkeleton />
-              ) : classification ? (
-                <div className="space-y-2 text-sm animate-fade-in">
-                  {(classification.category ?? classification.incident_type ?? classification.label) && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-muted-foreground">Category:</span>
-                      <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-cloud-sky/10 text-cloud-sky border border-cloud-sky/20">
-                        {classification.category ?? classification.incident_type ?? classification.label}
-                      </span>
-                      {(classification.confidence ?? classification.score) != null && (
-                        <span className="text-xs text-muted-foreground ml-auto">
-                          {Math.round(((classification.confidence ?? classification.score)!) * 100)}% confidence
-                        </span>
+          {(classificationLoading || classification) && (() => {
+            try {
+              return (
+                <div className="glass-card p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Brain className="w-4 h-4 text-cloud-sky" />
+                    <h3 className="text-sm font-semibold text-cloud-sky">ML Classification</h3>
+                    {classificationLoading && <Loader2 className="w-3 h-3 animate-spin text-cloud-sky" />}
+                  </div>
+                  {classificationLoading ? (
+                    <AnalysisSkeleton />
+                  ) : classification ? (
+                    <div className="space-y-2 text-sm animate-fade-in">
+                      {(classification.category ?? classification.incident_type ?? classification.label) && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground">Category:</span>
+                          <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-cloud-sky/10 text-cloud-sky border border-cloud-sky/20">
+                            {classification.category ?? classification.incident_type ?? classification.label}
+                          </span>
+                          {(classification.confidence ?? classification.score) != null && (
+                            <span className="text-xs text-muted-foreground ml-auto">
+                              {Math.round(((classification.confidence ?? classification.score)!) * 100)}% confidence
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      {classification.explanation != null && (
+                        typeof classification.explanation === "object" ? (
+                          <div className="text-sm text-muted-foreground space-y-1">
+                            {classification.explanation.predicted_class && (
+                              <p><strong className="text-foreground">Predicted class:</strong> {classification.explanation.predicted_class}</p>
+                            )}
+                            {classification.explanation.top_contributions != null && (
+                              <p><strong className="text-foreground">Top contributions:</strong> {JSON.stringify(classification.explanation.top_contributions)}</p>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-muted-foreground leading-relaxed">{classification.explanation}</p>
+                        )
                       )}
                     </div>
-                  )}
-                  {classification.explanation && (
-                    <p className="text-muted-foreground leading-relaxed">{classification.explanation}</p>
-                  )}
+                  ) : null}
                 </div>
-              ) : null}
-            </div>
-          )}
+              );
+            } catch {
+              return null;
+            }
+          })()}
 
           {/* Impact Analysis */}
           {showImpactAnalysis && (
