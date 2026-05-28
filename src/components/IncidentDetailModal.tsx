@@ -64,11 +64,13 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: inc.title,
-          service: inc.service,
-          provider: inc.provider,
-          severity: inc.severity,
-          description: (inc.raw_json as Record<string, unknown>)?.description ?? inc.title,
+          incident_id: inc.id,
+          description: (inc.raw_json as Record<string, unknown>)?.description as string ?? inc.title ?? "",
+          original_impact: (inc.raw_json as Record<string, unknown>)?.original_impact as string ?? "none",
+          provider: inc.provider ?? "",
+          service: inc.service ?? "",
+          affected_services_count: (inc.raw_json as Record<string, unknown>)?.affected_services_count as number ?? 1,
+          service_impact: (inc.raw_json as Record<string, unknown>)?.service_impact as string ?? "",
         }),
       });
       if (!res.ok) throw new Error(`classify returned ${res.status}`);
