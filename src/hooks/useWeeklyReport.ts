@@ -11,14 +11,26 @@ export interface WeeklyReport {
   aggregation?: Record<string, unknown> | null;
 }
 
+export interface WeeklyStats {
+  total: number;
+  criticalHigh: number;
+  resolved: number;
+}
+
 interface UseWeeklyReportResult {
   report: WeeklyReport | null;
+  stats: WeeklyStats | null;
   loading: boolean;
   error: string | null;
 }
 
+const CRITICAL_HIGH_SEVERITIES = new Set([
+  "critical", "outage", "severe", "high", "major", "error",
+]);
+
 export function useWeeklyReport(): UseWeeklyReportResult {
   const [report, setReport] = useState<WeeklyReport | null>(null);
+  const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,13 +48,22 @@ export function useWeeklyReport(): UseWeeklyReportResult {
 
         const { data, error: fetchError } = await supabase
           .from("incidents")
-          .select("id, provider, severity, service, description, raw_json")
+          .select("id, provider, severity, status, service, description, raw_json")
           .gte("created_at", weekAgo.toISOString())
           .lte("created_at", now.toISOString());
 
         if (fetchError) throw new Error(fetchError.message);
 
-        const incidents = (data ?? []).map((row) => ({
+        const rows = data ?? [];
+        setStats({
+          total: rows.length,
+          criticalHigh: rows.filter((r) =>
+            CRITICAL_HIGH_SEVERITIES.has((r.severity ?? "").toLowerCase())
+          ).length,
+          resolved: rows.filter((r) => r.status?.toLowerCase() === "resolved").length,
+        });
+
+        const incidents = rows.map((row) => ({
           incident_id: row.id,
           provider: row.provider ?? "unknown",
           final_severity: row.severity ?? "low",
@@ -73,5 +94,5 @@ export function useWeeklyReport(): UseWeeklyReportResult {
     loadReport();
   }, []);
 
-  return { report, loading, error };
+  return { report, stats, loading, error };
 }

@@ -62,7 +62,13 @@ const DashboardSection = () => {
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
 
   const { incidents, loading, error } = useIncidents(200);
-  const { report: weeklyReport, loading: weeklyLoading } = useWeeklyReport();
+  const { report: weeklyReport, stats: weeklyStats, loading: weeklyLoading } = useWeeklyReport();
+
+  const weeklyEndDate = new Date();
+  const weeklyStartDate = new Date();
+  weeklyStartDate.setDate(weeklyEndDate.getDate() - 7);
+  const fmtDate = (d: Date) =>
+    d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }).toUpperCase();
 
   useEffect(() => {
     const newCritical = incidents.find(
@@ -122,21 +128,21 @@ const DashboardSection = () => {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="space-y-1.5">
               <h3 className="eyebrow">Total Incidents</h3>
-              <p className="text-foreground font-medium text-lg">{incidents.length}</p>
+              <p className="text-foreground font-medium text-lg">{weeklyStats?.total ?? incidents.length}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Live count across {sortedProviders.length} providers
               </p>
             </div>
             <div className="space-y-1.5">
               <h3 className="eyebrow">Critical / High</h3>
-              <p className="text-foreground font-medium text-lg">{criticalCount}</p>
+              <p className="text-foreground font-medium text-lg">{weeklyStats?.criticalHigh ?? criticalCount}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Incidents requiring immediate attention
               </p>
             </div>
             <div className="space-y-1.5">
               <h3 className="eyebrow">Resolved</h3>
-              <p className="text-foreground font-medium text-lg">{resolvedCount}</p>
+              <p className="text-foreground font-medium text-lg">{weeklyStats?.resolved ?? resolvedCount}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Incidents resolved in current dataset
               </p>
@@ -145,7 +151,12 @@ const DashboardSection = () => {
 
           {(weeklyLoading || weeklyReport?.summary) && (
             <div className="mt-6 pt-6 border-t border-white/[0.06]">
-              <h3 className="eyebrow mb-2">7-day intelligence report</h3>
+              <div className="flex items-center mb-2">
+                <h3 className="eyebrow"><span>7-DAY INTELLIGENCE REPORT</span></h3>
+                <span className="text-gray-400 text-xs ml-2">
+                  {fmtDate(weeklyStartDate)} – {fmtDate(weeklyEndDate)}
+                </span>
+              </div>
               {weeklyLoading ? (
                 <div className="space-y-2">
                   <div className="h-3 w-full bg-muted/40 rounded animate-pulse" />
@@ -153,7 +164,13 @@ const DashboardSection = () => {
                   <div className="h-3 w-4/6 bg-muted/40 rounded animate-pulse" />
                 </div>
               ) : (
-                <div className="prose prose-invert prose-sm max-w-none text-gray-300">
+                <div className="prose prose-invert prose-sm max-w-none space-y-4
+                  [&>h1]:text-lg [&>h1]:font-bold [&>h1]:text-white [&>h1]:border-b [&>h1]:border-white/10 [&>h1]:pb-2
+                  [&>h2]:text-base [&>h2]:font-semibold [&>h2]:text-blue-300 [&>h2]:mt-4
+                  [&>h3]:text-sm [&>h3]:font-semibold [&>h3]:text-blue-200
+                  [&>p]:text-gray-300 [&>p]:leading-relaxed
+                  [&>ul]:space-y-1 [&>ul>li]:text-gray-300
+                  [&>strong]:text-white">
                   <ReactMarkdown>{weeklyReport!.summary}</ReactMarkdown>
                 </div>
               )}
