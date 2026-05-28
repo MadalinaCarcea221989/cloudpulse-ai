@@ -26,12 +26,12 @@ const HeroSection = () => {
 
         {/* Description */}
         <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto mb-10 fade-in-delay-3 leading-relaxed">
-          One place to catch issues across AWS, Azure, and GCP, and fix them faster with your team.
+          One place to catch issues across multiple cloud providers like AWS, Azure, and GCP, and fix them faster with your team.
         </p>
 
         {/* Provider chips */}
         <div className="flex items-center justify-center gap-2 fade-in-delay-3">
-          {["AWS", "Azure", "GCP"].map((p) => (
+          {["AWS", "Azure", "GCP", "Cloudflare", "DigitalOcean", "Atlassian"].map((p) => (
             <span
               key={p}
               className="glass-pill px-3.5 py-1 text-xs font-medium text-muted-foreground tracking-wide"
