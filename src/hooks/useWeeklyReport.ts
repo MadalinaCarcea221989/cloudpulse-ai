@@ -22,35 +22,45 @@ interface UseWeeklyReportResult {
   stats: WeeklyStats | null;
   loading: boolean;
   error: string | null;
+  periodStart: Date;
+  periodEnd: Date;
 }
 
 const CRITICAL_HIGH_SEVERITIES = new Set([
   "critical", "outage", "severe", "high", "major", "error",
 ]);
 
-export function useWeeklyReport(): UseWeeklyReportResult {
+export function useWeeklyReport(weekOffset = 0): UseWeeklyReportResult {
   const [report, setReport] = useState<WeeklyReport | null>(null);
   const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Stable dates for the return value (re-derived from weekOffset each render)
+  const periodEnd = new Date();
+  periodEnd.setDate(periodEnd.getDate() - weekOffset * 7);
+  const periodStart = new Date(periodEnd);
+  periodStart.setDate(periodEnd.getDate() - 7);
+
   useEffect(() => {
     async function loadReport() {
       setLoading(true);
+      setReport(null);
+      setStats(null);
       setError(null);
       try {
-        const now = new Date();
-        const weekAgo = new Date(now);
-        weekAgo.setDate(weekAgo.getDate() - 7);
-
-        const periodStart = weekAgo.toISOString().split("T")[0];
-        const periodEnd = now.toISOString().split("T")[0];
+        const end = new Date();
+        end.setDate(end.getDate() - weekOffset * 7);
+        const start = new Date(end);
+        start.setDate(end.getDate() - 7);
 
         const { data, error: fetchError } = await supabase
           .from("incidents")
           .select("id, provider, severity, status, service, description, raw_json")
-          .gte("created_at", weekAgo.toISOString())
-          .lte("created_at", now.toISOString());
+          .gte("started_at", start.toISOString())
+          .lte("started_at", end.toISOString())
+          .not("provider_incident_id", "like", "azure-mock-%")
+          .not("provider_incident_id", "like", "aws-mock-%");
 
         if (fetchError) throw new Error(fetchError.message);
 
@@ -77,7 +87,11 @@ export function useWeeklyReport(): UseWeeklyReportResult {
         const res = await fetch(`${ML_CLASSIFIER_URL}/weekly`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ period_start: periodStart, period_end: periodEnd, incidents }),
+          body: JSON.stringify({
+            period_start: start.toISOString().split("T")[0],
+            period_end: end.toISOString().split("T")[0],
+            incidents,
+          }),
         });
 
         if (!res.ok) throw new Error(`/weekly returned ${res.status}`);
@@ -92,7 +106,7 @@ export function useWeeklyReport(): UseWeeklyReportResult {
     }
 
     loadReport();
-  }, []);
+  }, [weekOffset]);
 
-  return { report, stats, loading, error };
+  return { report, stats, loading, error, periodStart, periodEnd };
 }

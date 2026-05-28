@@ -61,12 +61,17 @@ const DashboardSection = () => {
   const [notifiedIds, setNotifiedIds] = useState<Set<string>>(new Set());
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
 
-  const { incidents, loading, error } = useIncidents(200);
-  const { report: weeklyReport, stats: weeklyStats, loading: weeklyLoading } = useWeeklyReport();
+  const [weekOffset, setWeekOffset] = useState(0);
 
-  const weeklyEndDate = new Date();
-  const weeklyStartDate = new Date();
-  weeklyStartDate.setDate(weeklyEndDate.getDate() - 7);
+  const { incidents, loading, error } = useIncidents(200);
+  const {
+    report: weeklyReport,
+    stats: weeklyStats,
+    loading: weeklyLoading,
+    periodStart: weeklyStartDate,
+    periodEnd: weeklyEndDate,
+  } = useWeeklyReport(weekOffset);
+
   const fmtDate = (d: Date) =>
     d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }).toUpperCase();
 
@@ -151,11 +156,25 @@ const DashboardSection = () => {
 
           {(weeklyLoading || weeklyReport?.summary) && (
             <div className="mt-6 pt-6 border-t border-white/[0.06]">
-              <div className="flex items-center mb-2">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
                 <h3 className="eyebrow"><span>7-DAY INTELLIGENCE REPORT</span></h3>
-                <span className="text-gray-400 text-xs ml-2">
-                  {fmtDate(weeklyStartDate)} – {fmtDate(weeklyEndDate)}
-                </span>
+                <div className="flex items-center gap-2 text-xs text-gray-400 ml-2">
+                  <button
+                    onClick={() => setWeekOffset((w) => Math.min(w + 1, 8))}
+                    disabled={weekOffset >= 8}
+                    className="hover:text-white disabled:opacity-30 transition-colors"
+                  >
+                    ← Prev
+                  </button>
+                  <span>{fmtDate(weeklyStartDate)} – {fmtDate(weeklyEndDate)}</span>
+                  <button
+                    onClick={() => setWeekOffset((w) => Math.max(0, w - 1))}
+                    disabled={weekOffset === 0}
+                    className="hover:text-white disabled:opacity-30 transition-colors"
+                  >
+                    Next →
+                  </button>
+                </div>
               </div>
               {weeklyLoading ? (
                 <div className="space-y-2">
