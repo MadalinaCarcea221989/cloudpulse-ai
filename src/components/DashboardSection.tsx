@@ -16,6 +16,7 @@ import IncidentCard, { Incident } from "./IncidentCard";
 import IncidentDetailModal from "./IncidentDetailModal";
 import ConnectInfrastructureModal from "./ConnectInfrastructureModal";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 import { useIncidents } from "@/hooks/useIncidents";
 import { useWeeklyReport } from "@/hooks/useWeeklyReport";
 
@@ -152,9 +153,9 @@ const DashboardSection = () => {
                   <div className="h-3 w-4/6 bg-muted/40 rounded animate-pulse" />
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {weeklyReport!.summary}
-                </p>
+                <div className="prose prose-invert prose-sm max-w-none text-gray-300">
+                  <ReactMarkdown>{weeklyReport!.summary}</ReactMarkdown>
+                </div>
               )}
             </div>
           )}
