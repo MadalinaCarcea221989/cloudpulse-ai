@@ -24,7 +24,7 @@ interface SimilarIncident {
 
 interface ClassificationExplanation {
   predicted_class?: string;
-  top_contributions?: unknown;
+  top_contributions?: unknown[];
   expected_value_for_class?: unknown;
 }
 
@@ -354,7 +354,21 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
                               <p><strong className="text-foreground">Predicted class:</strong> {classification.explanation.predicted_class}</p>
                             )}
                             {classification.explanation.top_contributions != null && (
-                              <p><strong className="text-foreground">Top contributions:</strong> {JSON.stringify(classification.explanation.top_contributions)}</p>
+                              <div className="mt-2 space-y-1">
+                                {(classification.explanation.top_contributions as any[]).map((item: any, i: number) => (
+                                  <div key={i} className="flex items-center justify-between text-sm">
+                                    <span className="font-mono text-blue-300">"{item.token}"</span>
+                                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                      item.direction === 'toward_medium' || item.direction?.includes('toward')
+                                        ? 'bg-yellow-500/20 text-yellow-300'
+                                        : 'bg-green-500/20 text-green-300'
+                                    }`}>
+                                      {item.direction?.replace(/_/g, ' ')}
+                                    </span>
+                                    <span className="text-gray-400 text-xs">SHAP: {item.shap_value?.toFixed(3)}</span>
+                                  </div>
+                                ))}
+                              </div>
                             )}
                           </div>
                         ) : (
