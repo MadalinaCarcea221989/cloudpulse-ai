@@ -57,6 +57,15 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
   const [remediationLoading, setRemediationLoading] = useState(false);
   const [remediationError, setRemediationError] = useState<string | null>(null);
 
+  const mapOriginalImpact = (impact: string | null | undefined): "none" | "minor" | "major" | "critical" => {
+    if (!impact) return "none";
+    const lower = impact.toLowerCase();
+    if (lower.includes("critical") || lower.includes("high")) return "critical";
+    if (lower.includes("major") || lower.includes("significant")) return "major";
+    if (lower.includes("minor") || lower.includes("low")) return "minor";
+    return "none";
+  };
+
   const fetchClassification = useCallback(async (inc: Incident) => {
     setClassificationLoading(true);
     try {
@@ -66,7 +75,7 @@ const IncidentDetailModal = ({ incident, open, onClose }: IncidentDetailModalPro
         body: JSON.stringify({
           incident_id: inc.id,
           description: (inc.raw_json as Record<string, unknown>)?.description as string ?? inc.title ?? "",
-          original_impact: (inc.raw_json as Record<string, unknown>)?.original_impact as string ?? "none",
+          original_impact: mapOriginalImpact((inc.raw_json as Record<string, unknown>)?.original_impact as string),
           provider: inc.provider ?? "",
           service: inc.service ?? "",
           affected_services_count: (inc.raw_json as Record<string, unknown>)?.affected_services_count as number ?? 1,
