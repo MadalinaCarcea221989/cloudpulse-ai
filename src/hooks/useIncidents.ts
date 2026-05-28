@@ -124,7 +124,9 @@ export function useIncidents(limit = 50): UseIncidentsResult {
         const { data, error: fetchError } = await supabase
           .from("incidents")
           .select("*")
-          .order("created_at", { ascending: false })
+          .not("provider_incident_id", "like", "azure-mock-%")
+          .not("provider_incident_id", "like", "aws-mock-%")
+          .order("started_at", { ascending: false })
           .limit(limit);
 
         if (fetchError) {
